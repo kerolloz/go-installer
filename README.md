@@ -4,11 +4,11 @@
 
 <h1 align="center"> Go Installer </h1>
 
-<center>
-<img align="center" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-<img align="center" src="http://hits.dwyl.io/kerolloz/go-installer.svg">
-<img align="center" src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
-</center>
+<p align="center">
+<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
+<img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
+<img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
+</p>
 
 </p>
 <p align="center">
