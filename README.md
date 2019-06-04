@@ -29,6 +29,4 @@ The script does the following steps:
 
 ![](https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif)
 
----
-
 > Inspired by [golang-tools-install-script](https://github.com/canha/golang-tools-install-script) by canha
