@@ -10,7 +10,6 @@
 <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
 </p>
 
-</p>
 <p align="center">
 Automate the installation of Golang with no <strike>hassle of environment variables setting</strike>. :wink: <br>
 Go is a fast and easy programming language so, the installation should be <b>fast and easy</b> :zap:, as well.
