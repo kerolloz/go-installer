@@ -81,7 +81,7 @@ echo "Extracting files to $destination..."
 
 tar -xzf $file_name
 
-mv "go/*" "$destination"
+mv go/* $destination
 rmdir go
 
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ]; then
@@ -104,7 +104,7 @@ echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $
 
 echo "`$TEXT_COLOR $BLUE`Testing `$TEXT_COLOR $CYAN`Go${RESET} installation.."
 
-. $HOME/.${shell_profile}
+$(`tail --lines=3 $HOME/.${shell_profile}`)
 
 go version
 
