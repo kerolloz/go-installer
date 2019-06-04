@@ -54,9 +54,9 @@ The script does the following steps:
 
 ## Insatll golang on Ubuntu or Mac
 
-Tested by Travis on:
-- Linux :white_check_mark:
-- Mac :white_check_mark:
+Tested by Travis :heavy_check_mark: on:
+- Linux :penguin:
+- Mac :computer:
 
 
 ### Acknowledgments
