@@ -1,18 +1,20 @@
 
 
+<p align="center">
+
+<h1 align="center"> Go Installer </h1>
+
 <center>
+<img align="center" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
+<img align="center" src="http://hits.dwyl.io/kerolloz/go-installer.svg">
+<img align="center" src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
+</center>
 
-<h1> Go Installer </h1>
-
-<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-<img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
-<img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
-<br>
-
+</p>
+<p align="center">
 Automate the installation of Golang with no <strike>hassle of environment variables setting</strike>. :wink: <br>
 Go is a fast and easy programming language so, the installation should be <b>fast and easy</b> :zap:, as well.
-
-</center>
+</p>
 
 
 <img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" style="display: block;
