@@ -4,23 +4,22 @@
 
 <h1 align="center"> Go Installer </h1>
 
-<center>
-<img align="center" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-<img align="center" src="http://hits.dwyl.io/kerolloz/go-installer.svg">
-<img align="center" src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
-</center>
-
+<p align="center">
+<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
+<img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
+<img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
 </p>
+
 <p align="center">
 Automate the installation of Golang with no <strike>hassle of environment variables setting</strike>. :wink: <br>
 Go is a fast and easy programming language so, the installation should be <b>fast and easy</b> :zap:, as well.
 </p>
 
+</p>
 
-<img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;">
+<p align="center">
+<img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" style="width: 80%; height: 80%;">
+</p>
 
 ## How to use it
 
@@ -44,11 +43,9 @@ The script does the following steps:
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
 
-<img src="https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif" style="display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;">
-
+<p align="center">
+<img src="https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif" style="width: 100%;">
+</p>
 
 ## Insatll golang on Ubuntu or Mac
 
