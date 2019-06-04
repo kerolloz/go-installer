@@ -11,6 +11,7 @@ wget https://raw.githubusercontent.com/kerolloz/go-installer/master/go.sh
 bash go.sh
 ```
 
+
 ## How it works
 
 The script does the following steps:
@@ -22,7 +23,7 @@ The script does the following steps:
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
 
-## 
+![](https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif)
 
 
 ---
