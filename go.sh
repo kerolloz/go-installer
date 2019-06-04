@@ -66,7 +66,7 @@ echo "Downloading `$TEXT_COLOR $CYAN`Go ${RESET}latest version(`$BACKGROUND_COLO
 wget --quiet --continue --show-progress $latest_version_link
 
 if [ $? -ne 0 ]; then
-    echo "Download failed! Exiting."
+    echo "`$TEXT_COLOR $RED`Download failed!"
     exit 1
 fi
 
@@ -75,7 +75,7 @@ workspace="$HOME/go/"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-mkdir -p -v $workplace{src,pkg,bin} $destination
+mkdir -p $workplace{src,pkg,bin} $destination
 
 echo "Extracting files to $destination..."
 
