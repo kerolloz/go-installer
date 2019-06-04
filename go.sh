@@ -102,14 +102,13 @@ tput cuu 1; tput ed; # move one line up; clear to end
 
 echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
 
-echo "`$TEXT_COLOR $BLUE`Testing `$TEXT_COLOR $CYAN`Go${RESET}.."
+echo "`$TEXT_COLOR $BLUE`Testing `$TEXT_COLOR $CYAN`Go${RESET} installation.."
 
-test_command = << END
+. $HOME/.${shell_profile}
+
 go version
 
 if [ $? -ne 0 ]; then
     echo "`$TEXT_COLOR $RED`Installation failed!!"
 fi
-END
 
-$SHELL -c $test_command
