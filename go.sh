@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# TODO: specify the version of go, user can chose the version he wants to install
-# TODO: User can choose whether to remove the installer or not 
-# TODO: test macos on travis
-# TODO: User can specify the place of extracting go binary (GOROOT) && workplace(GOPATH).. 
-
 # Colors definitions for tput
 
-BLACK=0    
-RED=1    
-GREEN=2    
-YELLOW=3    
-BLUE=4    
-MAGENTA=5    
-CYAN=6    
-WHITE=7   
+BLACK=0
+RED=1
+GREEN=2
+YELLOW=3
+BLUE=4
+MAGENTA=5
+CYAN=6
+WHITE=7
 RESET=`tput sgr0`
 TEXT_COLOR="tput setaf "
 BACKGROUND_COLOR="tput setab "
