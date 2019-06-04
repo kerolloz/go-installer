@@ -75,10 +75,15 @@ fi
 destination=$HOME/.go
 workspace="$HOME/go/"
 
-mkdir -p $workplace{src,pkg,bin} $destination
+tput cuu 1; tput ed; # move one line up; clear to end 
+
+mkdir -p -v $workplace{src,pkg,bin} $destination
 
 echo "Extracting files to $destination..."
-tar -C $destination -xzf $file_name
+
+tar -xzf $file_name
+
+mv go $destination
 
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ]; then
     shell_profile="zshrc"
@@ -96,6 +101,6 @@ touch "$HOME/.${shell_profile}"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-echo -e "`$TEXT_COLOR $GREEN`Go ($VERSION) has been installed successfully!"\
-"${RESET}\nPlease open a new terminal to start using Go.\n"\
-"TIP: you can `tput bold`source $HOME/.${shell_profile} ${RESET}to update your environment variables."
+echo -e "`$TEXT_COLOR $GREEN`Go ($VERSION) has been installed successfully!"
+
+source $HOME/.${shell_profile}
