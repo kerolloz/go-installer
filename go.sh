@@ -101,6 +101,10 @@ touch "$HOME/.${shell_profile}"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-echo -e "`$TEXT_COLOR $GREEN`Go ($VERSION) has been installed successfully!"
+echo "`$TEXT_COLOR $BLUE`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!"
 
 source $HOME/.${shell_profile}
+
+echo "Testing go!"
+
+go run test.go
