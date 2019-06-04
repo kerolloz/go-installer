@@ -70,7 +70,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-destination=$HOME/.go
+destination="$HOME/.go/"
 workspace="$HOME/go/"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
@@ -81,7 +81,7 @@ echo "Extracting files to $destination..."
 
 tar -xzf $file_name
 
-mv go $destination
+mv "go/" "$destination"
 
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ]; then
     shell_profile="zshrc"
@@ -99,10 +99,14 @@ touch "$HOME/.${shell_profile}"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-echo "`$TEXT_COLOR $BLUE`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!"
+echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
 
-source $HOME/.${shell_profile}
+$SHELL
 
-echo "Testing go!"
+echo "`$TEXT_COLOR $CYAN`Testing go.."
 
 go run test.go
+
+if [ $? -ne 0 ]; then
+    echo "`$TEXT_COLOR $RED`Installation failed!!"
+fi
