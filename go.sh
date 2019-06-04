@@ -7,6 +7,8 @@
 
 # Colors definitions for tput
 
+go version
+
 BLACK=0    
 RED=1    
 GREEN=2    
@@ -102,7 +104,7 @@ tput cuu 1; tput ed; # move one line up; clear to end
 
 echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
-$(`tail --lines=3 $HOME/.${shell_profile}`) # export
+$(`tail -n 3 $HOME/.${shell_profile}`) # export
 
 go version
 
