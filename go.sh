@@ -7,8 +7,6 @@
 
 # Colors definitions for tput
 
-go version
-
 BLACK=0    
 RED=1    
 GREEN=2    
