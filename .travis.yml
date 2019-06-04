@@ -1,0 +1,6 @@
+language: c
+os:
+  - linux
+  - osx
+script:
+  - bash go.sh
