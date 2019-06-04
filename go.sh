@@ -28,7 +28,7 @@ case $os in
             ;;
         "armv8")
             arch=arm64
-            ;; 
+            ;;
         .*386.*)
             arch=386
             ;;
@@ -47,16 +47,16 @@ link_regex="https://dl.google.com/go/$file_name"
 echo "Finding latest version of `$TEXT_COLOR $CYAN`Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
 
 latest_version_link=$(
-    wget -qO- https://golang.org/dl/ | # get the HTML of golang page 
+    wget -qO- https://golang.org/dl/ | # get the HTML of golang page
     grep -o $link_regex | # select installation links
     head -1 # only get the first link i.e.(latest version)
-)  
+)
 
 VERSION=$(grep -o $version_regex <<< $latest_version_link)
 
-tput cuu 1; tput ed; # move one line up; clear to end 
+tput cuu 1; tput ed; # move one line up; clear to end
 
-echo "Downloading `$TEXT_COLOR $CYAN`Go ${RESET}latest version(`$BACKGROUND_COLOR $BLACK; tput smul`$VERSION${RESET})..." 
+echo "Downloading `$TEXT_COLOR $CYAN`Go ${RESET}latest version(`$BACKGROUND_COLOR $BLACK; tput smul`$VERSION${RESET})..."
 
 wget --quiet --continue --show-progress $latest_version_link
 
@@ -65,10 +65,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-destination="$HOME/.go/" # better to be an empty folder just for go 
-workspace="$HOME/go/"    
+destination="$HOME/.go/" # better to be an empty folder just for go
+workspace="$HOME/go/"
 
-tput cuu 1; tput ed; # move one line up; clear to end 
+tput cuu 1; tput ed; # move one line up; clear to end
 
 mkdir -p $workplace{src,pkg,bin} $destination
 
@@ -93,7 +93,7 @@ touch "$HOME/.${shell_profile}"
     echo 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
 } >> "$HOME/.${shell_profile}"
 
-tput cuu 1; tput ed; # move one line up; clear to end 
+tput cuu 1; tput ed; # move one line up; clear to end
 
 echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
@@ -103,6 +103,7 @@ go version
 
 if [ $? -ne 0 ]; then
     echo "`$TEXT_COLOR $RED`Installation failed!!"
+    exit 1
 fi
 
 echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
