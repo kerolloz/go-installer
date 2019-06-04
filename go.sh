@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e # exit when any command fails
-
 # TODO: specify the version of go, user can chose the version he wants to install
 # TODO: User can choose whether to remove the installer or not 
 # TODO: test macos on travis
