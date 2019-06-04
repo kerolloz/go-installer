@@ -49,7 +49,7 @@ version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
 file_name="go$version_regex.$platform.tar.gz"
 link_regex="https://dl.google.com/go/$file_name"
 
-echo "Finding latest version of `$TEXT_COLOR $CYAN`Go for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
+echo "Finding latest version of `$TEXT_COLOR $CYAN`Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
 
 latest_version_link=$(
     wget -qO- https://golang.org/dl/ | # get the HTML of golang page 
@@ -100,11 +100,9 @@ touch "$HOME/.${shell_profile}"
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
+echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
-echo "`$TEXT_COLOR $BLUE`Testing `$TEXT_COLOR $CYAN`Go${RESET} installation.."
-
-$(`tail --lines=3 $HOME/.${shell_profile}`)
+$(`tail --lines=3 $HOME/.${shell_profile}`) # export
 
 go version
 
@@ -112,3 +110,4 @@ if [ $? -ne 0 ]; then
     echo "`$TEXT_COLOR $RED`Installation failed!!"
 fi
 
+echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
