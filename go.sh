@@ -49,7 +49,7 @@ version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
 file_name="go$version_regex.$platform.tar.gz"
 link_regex="https://dl.google.com/go/$file_name"
 
-echo "Finding latest version of Go for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
+echo "Finding latest version of `$TEXT_COLOR $CYAN`Go for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
 
 latest_version_link=$(
     wget -qO- https://golang.org/dl/ | # get the HTML of golang page 
@@ -61,7 +61,7 @@ VERSION=$(grep -o $version_regex <<< $latest_version_link)
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
-echo "Downloading `$TEXT_COLOR $BLUE`Go ${RESET}latest version(`$BACKGROUND_COLOR $BLACK; tput smul`$VERSION${RESET})..." 
+echo "Downloading `$TEXT_COLOR $CYAN`Go ${RESET}latest version(`$BACKGROUND_COLOR $BLACK; tput smul`$VERSION${RESET})..." 
 
 wget --quiet --continue --show-progress $latest_version_link
 
@@ -70,8 +70,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-destination="$HOME/.go/"
-workspace="$HOME/go/"
+destination="$HOME/.go/" # better to be an empty folder just for go 
+workspace="$HOME/go/"    
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
@@ -81,7 +81,8 @@ echo "Extracting files to $destination..."
 
 tar -xzf $file_name
 
-mv "go/" "$destination"
+mv "go/*" "$destination"
+rmdir go
 
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ]; then
     shell_profile="zshrc"
@@ -101,12 +102,14 @@ tput cuu 1; tput ed; # move one line up; clear to end
 
 echo "`$TEXT_COLOR $CYAN`Go${RESET} ($VERSION) has been installed `$TEXT_COLOR $GREEN`successfully!${RESET}"
 
-$SHELL
+echo "`$TEXT_COLOR $BLUE`Testing `$TEXT_COLOR $CYAN`Go${RESET}.."
 
-echo "`$TEXT_COLOR $CYAN`Testing go.."
-
-go run test.go
+test_command = << END
+go version
 
 if [ $? -ne 0 ]; then
     echo "`$TEXT_COLOR $RED`Installation failed!!"
 fi
+END
+
+$SHELL -c $test_command
