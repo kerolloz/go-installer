@@ -73,6 +73,9 @@ if [ $? -ne 0 ]; then
 fi
 
 destination=$HOME/.go
+workspace="$HOME/go/"
+
+mkdir -p $workplace{src,pkg,bin} $destination
 
 echo "Extracting files to $destination..."
 tar -C $destination -xzf $file_name
@@ -90,10 +93,6 @@ touch "$HOME/.${shell_profile}"
     echo 'export GOPATH=$HOME/go'
     echo 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
 } >> "$HOME/.${shell_profile}"
-
-workspace="$HOME/go/"
-
-mkdir -p $workplace{src,pkg,bin}
 
 tput cuu 1; tput ed; # move one line up; clear to end 
 
