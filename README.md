@@ -46,11 +46,16 @@ The script does the following steps:
 <img src="https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif" style="width: 100%;">
 </p>
 
-## Insatll golang on Ubuntu or Mac
+## Tests
 
 Tested by Travis :heavy_check_mark: on:
 - Linux :penguin:
 - Mac :computer:
+
+Tested manually on:
+- Ubuntu
+- CentOS
+- Manjaro 
 
 
 ## Acknowledgments

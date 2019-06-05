@@ -97,7 +97,9 @@ tput cuu 1; tput ed; # move one line up; clear to end
 
 echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
-$(`tail -n 3 $HOME/.${shell_profile}`) # export
+# $(`tail -n 3 $HOME/.${shell_profile}`) # export
+
+$SHELL -c "source $HOME/.${shell_profile}"
 
 go version
 
