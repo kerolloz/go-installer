@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Colors definitions for tput
+go version
 
 BLACK=0
 RED=1
