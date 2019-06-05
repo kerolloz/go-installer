@@ -99,12 +99,12 @@ echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
 # $(`tail -n 3 $HOME/.${shell_profile}`) # export
 
-$SHELL -c "source $HOME/.${shell_profile}"
+. $HOME/.${shell_profile}
 
 go version
 
 if [ $? -ne 0 ]; then
-    echo "`$TEXT_COLOR $RED`Installation failed!!"
+    echo "`$TEXT_COLOR $RED`Installation failed!!${RESET}"
     exit 1
 fi
 
