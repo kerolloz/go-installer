@@ -54,7 +54,7 @@ Tested by Travis :heavy_check_mark: on:
 - Mac :computer:
 
 
-### Acknowledgments
+## Acknowledgments
 
 - Inspired by [golang-tools-install-script](https://github.com/canha/golang-tools-install-script) by canha :sparkles:
 
