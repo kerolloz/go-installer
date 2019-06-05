@@ -2,7 +2,7 @@
 
 <p align="center">
 
-<h1 align="center"> Go Installer </h1>
+<h1 align="center"> Go Installer 🐹 </h1>
 
 <p align="center">
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
@@ -11,8 +11,7 @@
 </p>
 
 <p align="center">
-Automate the installation of Golang with no more <strike>hassle of environment variables setting</strike>. :wink: <br>
-Go is a fast and easy programming language so, the installation should be <b>fast and easy</b> :zap:, as well.
+Install Golang on Linux or Mac with no more <strike>hassle of environment variables setting</strike>.<br>
 </p>
 
 </p>
