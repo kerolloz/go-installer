@@ -5,9 +5,15 @@
 <h1 align="center"> Go Installer 🐹 </h1>
 
 <p align="center">
-<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-<img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
-<img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
+  <a href="https://github.com/kerolloz/go-installer/issues">
+    <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
+  </a>
+  <a href="http://hits.dwyl.io/kerolloz/go-installer">
+    <img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
+  </a>
+  <a href="https://travis-ci.com/kerolloz/go-installer"> 
+    <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master"> 
+  </a>
 </p>
 
 <p align="center">
