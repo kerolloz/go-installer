@@ -78,7 +78,7 @@ The script does the following steps:
 - adds the binaries to PATH environmental variable
 
 <p align="center">
-  <img src="https://media.giphy.com/media/if3z5dYg1a9rmdL0Aq/giphy.gif" width="80%">
+  <img src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
 </p>
 
 ## Tests
