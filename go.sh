@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# TODO:
-#       User can remove installed version of Go
-#       User can update current version of Go
-
-# Colors definitions for tput
+# Color definitions for tput
 
 BLACK=0
 RED=1
