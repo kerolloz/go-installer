@@ -1,4 +1,4 @@
-language: minimal
+language: go
 os:
   - linux
   - osx
