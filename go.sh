@@ -113,9 +113,9 @@ function remove(){
 }
 
 function test_installaion(){
-    echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
+    echo "`$BACKGROUND_COLOR $BLACK`Testing installation..${RESET}"
 
-    $GOROOT/bin/go version $> /dev/null
+    $GOROOT/bin/go help $> /dev/null
 
     if [ $? -ne 0 ]; then
         echo "`$TEXT_COLOR $RED`Installation failed!!${RESET}"
