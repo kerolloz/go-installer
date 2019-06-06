@@ -103,6 +103,7 @@ function remove(){
 
     echo "Creating a backup of your ${RC_PROFILE} to ${RC_PROFILE}-BACKUP"
     cp "$RC_PROFILE" "${RC_PROFILE}-BACKUP"
+    echo "Removing exports for GOROOT & GOPATH from ${RC_PROFILE}"
     sed -i '/export GOROOT/d' "${RC_PROFILE}"
     sed -i '/:$GOROOT/d' "${RC_PROFILE}"
     sed -i '/export GOPATH/d' "${RC_PROFILE}"
@@ -179,8 +180,8 @@ function update_go(){
 
     eval $CLEAR_UP
     echo -e "          VERSION"
-    echo -e "LATEST:   $latest"
     echo -e "CURRENT:  $current"
+    echo -e "LATEST:   $latest"
 
     if [[ $current == $latest ]]; then
         echo "You already have the latest version of `$TEXT_COLOR $CYAN`Go${RESET} Installed!"
