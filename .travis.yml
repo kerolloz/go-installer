@@ -3,5 +3,5 @@ os:
   - linux
   - osx
 script:
-  - bash go.sh         # install
   - bash go.sh remove  # uninstall
+  - bash go.sh         # install
