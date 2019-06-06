@@ -244,7 +244,7 @@ function main(){
         ;;
         *)
             print_help 
-            exit 1 
+            exit 
         ;;
         esac
     fi
