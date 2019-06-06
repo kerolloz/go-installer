@@ -5,25 +5,29 @@
 <h1 align="center"> Go Installer 🐹 </h1>
 
 <p align="center">
+  
   <a href="https://github.com/kerolloz/go-installer/issues">
     <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
   </a>
+  
   <a href="http://hits.dwyl.io/kerolloz/go-installer">
     <img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
   </a>
+  
   <a href="https://travis-ci.com/kerolloz/go-installer"> 
     <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master"> 
   </a>
+  
 </p>
 
 <p align="center">
-Install Golang on Linux or Mac with no more <strike>hassle of environment variables setting</strike>.<br>
+  Install Golang on Linux or Mac with no more <strike>hassle of environment variables setting</strike>.
 </p>
 
 </p>
 
 <p align="center">
-<img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" style="width: 80%; height: 80%;">
+  <img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" width="50%">
 </p>
 
 ## How to use it
@@ -61,8 +65,7 @@ Tested by Travis :heavy_check_mark: on:
 Tested manually on:
 - Ubuntu
 - CentOS
-- Manjaro 
-
+- Manjaro  
 
 ## Acknowledgments
 
