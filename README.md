@@ -98,10 +98,6 @@ Tested manually on:
 - Ubuntu
 - Manjaro
 
-## Acknowledgments
-
-- Inspired by [golang-tools-install-script](https://github.com/canha/golang-tools-install-script) by canha :sparkles:
-
 ## License
 
 [MIT License](/LICENSE.md)
