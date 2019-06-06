@@ -113,10 +113,7 @@ function remove(){
 }
 
 function test_installaion(){
-    echo "`$BACKGROUND_COLOR $BLACK`Testing installation..${RESET}"
-
-    go version &> /dev/null
-
+   
     if [ $? -ne 0 ]; then
         echo "`$TEXT_COLOR $RED`Installation failed!!${RESET}"
         exit 1
@@ -190,7 +187,8 @@ function update_go(){
     fi
     echo "Updating will remove the current installed version from $GOROOT."
     if [ $1 = "update" ]; then
-        #  update is used to force update for testing on travis
+        # update is used to force update for testing on travis
+        # bypass read option 
         option=""
     else 
         echo -e  "Do you want to update to Go(${latest})? [ENTER(yes)/n]: " 
