@@ -189,8 +189,13 @@ function update_go(){
         exit
     fi
     echo "Updating will remove the current installed version from $GOROOT."
-    echo -e  "Do you want to update to Go(${latest})? [ENTER(yes)/n]: " 
-    read option
+    if [ $1 = "update" ]; then
+        #  update is used to force update for testing on travis
+        option=""
+    else 
+        echo -e  "Do you want to update to Go(${latest})? [ENTER(yes)/n]: " 
+        read option
+    fi
 
     case $option in 
         "" | Y* | y*)
@@ -234,13 +239,16 @@ function main(){
         case $1 in 
         "remove")
             remove 
+            exit 
+        ;;
+        "update")
+
         ;;
         *)
             print_help 
             exit 1 
         ;;
         esac
-        exit 
     fi
 
     what_platform
@@ -248,7 +256,7 @@ function main(){
     find_latest_version_link
     go_exists
     if [[ $? == 0 ]]; then
-        update_go
+        update_go $1
     else
         install_go
     fi
