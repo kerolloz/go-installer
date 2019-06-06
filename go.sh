@@ -1,7 +1,9 @@
 #!/bin/bash
+# TODO
+# User can remove installed version of Go
+# User can update current version of Go
 
 # Colors definitions for tput
-go version
 
 BLACK=0
 RED=1
@@ -14,6 +16,65 @@ WHITE=7
 RESET=`tput sgr0`
 TEXT_COLOR="tput setaf "
 BACKGROUND_COLOR="tput setab "
+CLEAR_UP="tput cuu 1; tput ed;"
+
+extract_version(){
+    $(grep -o $version_regex <<< $latest_version_link)
+}
+
+find_latest_version(){
+
+    echo "Finding latest version of `$TEXT_COLOR $CYAN`Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
+
+    latest_version_link=$(
+        wget -qO- https://golang.org/dl/ | # get the HTML of golang page
+        grep -o $link_regex | # select installation links
+        head -1 # only get the first link i.e.(latest version)
+    )
+
+    LATEST_VERSION=
+
+}
+
+remove(){
+    eval $CLEAR_UP
+    echo "`$TEXT_COLOR $RED` $INSTALLED_VERSION${RESET}"
+    GOPATH=$(go env GOPATH)
+    GOROOT=$(go env GOROOT)
+
+    exit
+}
+
+update(){
+    read -p "Do you want to update? ([ENTER(yes)/n]: " option
+
+    case $option in 
+        "" | Y* | y*)
+        ;;
+        N* | n*)
+            echo "Okay, Bye!"
+            exit 0
+        ;;
+        *)
+            echo "Wrong choice!"
+            exit 1
+        ;;
+    esac
+
+    remove && install
+}
+
+help(){
+    echo "go.sh is a tool that helps you easily install, upgrade or unistall Go"
+    echo -e "[USAGE]\n\tbash go.sh"
+}
+
+# Check if go is already installed 
+INSTALLED_VERSION=$(go version) && echo "You already have Go installed!" && update
+
+echo "CONTINUING";
+exit
+
 
 os="$(uname -s)"
 arch="$(uname -m)"
@@ -41,21 +102,7 @@ case $os in
     ;;
 esac
 
-version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
-file_name="go$version_regex.$platform.tar.gz"
-link_regex="https://dl.google.com/go/$file_name"
-
-echo "Finding latest version of `$TEXT_COLOR $CYAN`Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
-
-latest_version_link=$(
-    wget -qO- https://golang.org/dl/ | # get the HTML of golang page
-    grep -o $link_regex | # select installation links
-    head -1 # only get the first link i.e.(latest version)
-)
-
-VERSION=$(grep -o $version_regex <<< $latest_version_link)
-
-tput cuu 1; tput ed; # move one line up; clear to end
+eval $CLEAR_UP
 
 echo "Downloading `$TEXT_COLOR $CYAN`Go ${RESET}latest version(`$BACKGROUND_COLOR $BLACK; tput smul`$VERSION${RESET})..."
 
@@ -69,7 +116,7 @@ fi
 destination="$HOME/.go/" # better to be an empty folder just for go
 workspace="$HOME/go/"
 
-tput cuu 1; tput ed; # move one line up; clear to end
+eval $CLEAR_UP
 
 mkdir -p $workplace{src,pkg,bin} $destination
 
@@ -94,7 +141,7 @@ touch "$HOME/.${shell_profile}"
     echo 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
 } >> "$HOME/.${shell_profile}"
 
-tput cuu 1; tput ed; # move one line up; clear to end
+eval $CLEAR_UP
 
 echo "`$BACKGROUND_COLOR $BLACK`Testing installation.."
 
