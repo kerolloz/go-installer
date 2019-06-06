@@ -34,7 +34,27 @@ You can clone the repository or just use `wget` to download the script
 wget https://raw.githubusercontent.com/kerolloz/go-installer/master/go.sh
 bash go.sh
 ```
+
 Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the magic happen! :crystal_ball:
+
+#### Please Note that
+
+By default the script will create `.go` and `go` folders on your home directory, add the needed variables and PATH expansion.  
+`$HOME/.go is location where Go will be installed to.`  
+`$HOME/go is the default workspace.`  
+
+In order to install Go to other location and set custom workspace set environment variables GOROOT and GOPATH before installing (uninstalling) Go tools:
+```bash
+export GOROOT=/opt/go
+export GOPATH=$HOME/projects/go
+```
+Read more about [workspaces](https://golang.org/doc/code.html#Workspaces).
+
+## Uninstall Go
+
+```bash
+bash go.sh remove
+```
 
 ## How it works
 
@@ -60,7 +80,6 @@ Tested by Travis :heavy_check_mark: on:
 
 Tested manually on:
 - Ubuntu
-- CentOS
 - Manjaro 
 
 
