@@ -1,6 +1,6 @@
-language: minimal
+language: go
 os:
   - linux
   - osx
 script:
-  - bash go.sh
+  - bash go.sh update  
