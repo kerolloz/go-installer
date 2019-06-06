@@ -83,7 +83,7 @@ function remove(){
     go_exists
     if [[ $? -ne 0 ]]; then 
         echo "`$TEXT_COLOR $RED`Go is not installed!${RESET}"
-        exit 1
+        exit 
     fi
     what_shell_profile
     what_installed_version
