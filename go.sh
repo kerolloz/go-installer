@@ -13,7 +13,7 @@ WHITE=7
 RESET=`tput sgr0`
 TEXT_COLOR="tput setaf "
 BACKGROUND_COLOR="tput setab "
-CLEAR_UP="tput cuu 1; tput ed;"
+CLEAR_UP="#tput cuu 1; tput ed;"
 
 version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
 
