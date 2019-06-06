@@ -53,8 +53,12 @@ function what_shell_profile(){
     fi
 }
 
+function what_installed_version(){
+    INSTALLED_VERSION=$(go version)
+}
+
 function extract_version_from(){
-    local version=$(grep -o $version_regex <<< "$1")
+    local version=$(grep -o "$version_regex" <<< "$1")
     echo "$version"
 }
 
@@ -82,7 +86,7 @@ function remove(){
         exit 1
     fi
     what_shell_profile
-
+    what_installed_version
     echo "`$TEXT_COLOR $RED`removing $INSTALLED_VERSION${RESET} from ${GOROOT}"
 
     rm -r $GOROOT
@@ -167,11 +171,9 @@ function echo_finding(){
 }
 
 function update_go(){
-    INSTALLED_VERSION=$(go version)
     GOPATH=$(go env GOPATH)
     GOROOT=$(go env GOROOT)
-
-
+    what_installed_version
     latest=`extract_version_from "$latest_version_link"`
     current=`extract_version_from "$INSTALLED_VERSION"`
 
