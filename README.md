@@ -82,10 +82,11 @@ The script does the following steps:
 <p align="center">
 
   <img src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
-  <p align="center">
-    <blockquote align="center">WORKS LIKE A CHARM :rocket:</blockquote>
-  </p>
+  <blockquote>
+      <p align="center" text-aligh="center">WORKS LIKE A CHARM :rocket:</p>
+  </blockquote>
 </p>
+
 
 ## Tests
 
