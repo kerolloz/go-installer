@@ -32,6 +32,8 @@
 
 ## How to use it
 
+### Installing Go
+
 You can clone the repository or just use `wget` to download the script
 
 ```bash
@@ -44,6 +46,7 @@ Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the
 #### Please Note that
 
 By default the script will create `.go` and `go` folders on your home directory, add the needed variables and PATH expansion.  
+
 `$HOME/.go is location where Go will be installed to.`  
 `$HOME/go is the default workspace.`  
 
@@ -54,26 +57,28 @@ export GOPATH=$HOME/projects/go
 ```
 Read more about [workspaces](https://golang.org/doc/code.html#Workspaces).
 
-## Uninstall Go
+### Uninstalling Go
 
 ```bash
 bash go.sh remove
 ```
 
-## How it works
+## How it works :fire:
 
 The script does the following steps:
 
+- checks if you have already installed Go!
 - automatically checks the installed operating system (Linux or Mac)
 - detects system architecture (armv6, armv8, amd64, i386)
-- parses the [golang](https://golang.org/dl) download page for the latest version of Go that is available for your platform and architecture
+- parses the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
+- in case of having **already installed Go**, if the latest and the current version are equal, the script **exits** :wave:
 - downloads the latest version
 - creates needed folders for workspace and Go binaries
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
 
 <p align="center">
-<img src="https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif" style="width: 100%;">
+<img src="https://media.giphy.com/media/fAKdnja3pZuc4SHt5g/giphy.gif" style="width: 80%;">
 </p>
 
 ## Tests
