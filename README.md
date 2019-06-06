@@ -78,7 +78,7 @@ The script does the following steps:
 - adds the binaries to PATH environmental variable
 
 <p align="center">
-<div style="width:100%;height:0;padding-bottom:68%;position:relative;"><iframe src="https://giphy.com/embed/if3z5dYg1a9rmdL0Aq" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/if3z5dYg1a9rmdL0Aq"></a></p>
+  <img src="https://media.giphy.com/media/if3z5dYg1a9rmdL0Aq/giphy.gif" width="80%">
 </p>
 
 ## Tests
