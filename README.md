@@ -5,19 +5,19 @@
 <h1 align="center"> Go Installer 🐹 </h1>
 
 <p align="center">
-  
+
   <a href="https://github.com/kerolloz/go-installer/issues">
     <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
   </a>
-  
+
   <a href="http://hits.dwyl.io/kerolloz/go-installer">
     <img src="http://hits.dwyl.io/kerolloz/go-installer.svg">
   </a>
-  
-  <a href="https://travis-ci.com/kerolloz/go-installer"> 
-    <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master"> 
+
+  <a href="https://travis-ci.com/kerolloz/go-installer">
+    <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
   </a>
-  
+
 </p>
 
 <p align="center">
@@ -30,9 +30,9 @@
   <img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" width="50%">
 </p>
 
-## How to use it
+## How to use it :thinking:
 
-### Installing Go
+### Installing(or updating) Go :arrow_down:
 
 You can clone the repository or just use `wget` to download the script
 
@@ -45,19 +45,21 @@ Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the
 
 #### Please Note that
 
-By default the script will create `.go` and `go` folders on your home directory, add the needed variables and PATH expansion.  
+By default the script will create `.go` and `go` folders on your _HOME_ directory, add the needed variables to your _PATH_ variable.  
 
 `$HOME/.go is location where Go will be installed to.`  
 `$HOME/go is the default workspace.`  
 
-In order to install Go to other location and set custom workspace set environment variables GOROOT and GOPATH before installing (uninstalling) Go tools:
-```bash
-export GOROOT=/opt/go
-export GOPATH=$HOME/projects/go
-```
-Read more about [workspaces](https://golang.org/doc/code.html#Workspaces).
+In order to install Go to other location or set custom workspace. You can set environment variables GOROOT or GOPATH before installing (or uninstalling) Go.  
 
-### Uninstalling Go
+For example:  
+```bash
+export GOROOT=/opt/go            # where Go is installed
+export GOPATH=$HOME/projects/go  # your workspace
+```
+Read more about [workspaces](https://golang.org/doc/code.html#Workspaces) in Go.
+
+### Uninstalling Go :trash:
 
 ```bash
 bash go.sh remove
@@ -78,7 +80,11 @@ The script does the following steps:
 - adds the binaries to PATH environmental variable
 
 <p align="center">
+
   <img src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
+  <p align="center">
+    <blockquote align="center">WORKS LIKE A CHARM :rocket:</blockquote>
+  </p>
 </p>
 
 ## Tests
@@ -89,7 +95,7 @@ Tested by Travis :heavy_check_mark: on:
 
 Tested manually on:
 - Ubuntu
-- Manjaro 
+- Manjaro
 
 ## Acknowledgments
 
