@@ -59,7 +59,7 @@ export GOPATH=$HOME/projects/go  # your workspace
 ```
 Read more about [workspaces](https://golang.org/doc/code.html#Workspaces) in Go.
 
-### Uninstalling Go :trash:
+### Uninstalling Go :x:
 
 ```bash
 bash go.sh remove
