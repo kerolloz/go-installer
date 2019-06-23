@@ -186,7 +186,7 @@ function update_go(){
         exit
     fi
     echo "Updating will remove the current installed version from $GOROOT."
-    if [ $1 = "update" ]; then
+    if [[ $1 == "update" ]]; then
         # update is used to force update for testing on travis
         # bypass read option 
         option=""
