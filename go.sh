@@ -191,7 +191,7 @@ function update_go(){
         # bypass read option 
         option=""
     else 
-        echo -e  "Do you want to update to Go(${latest})? [ENTER(yes)/n]: " 
+        echo -e  "Do you want to update to Go(${latest})? [ENTER(yes)/n]: \c" 
         read option
     fi
 
