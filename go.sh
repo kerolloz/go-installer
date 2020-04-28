@@ -61,7 +61,6 @@ function extract_version_from() {
 }
 
 function find_latest_version_link() {
-
   file_name="go$version_regex.$platform.tar.gz"
   link_regex="https://dl.google.com/go/$file_name"
 
@@ -71,6 +70,7 @@ function find_latest_version_link() {
       head -1 # only get the first link i.e.(latest version)
   )
 
+  latest_version_file_name=$(grep -o "$file_name" <<<"$latest_version_link")
 }
 
 function go_exists() {
@@ -78,18 +78,16 @@ function go_exists() {
 }
 
 function remove() {
-  go_exists
-  if [[ $? -ne 0 ]]; then
+  if ! go_exists; then
     echo "$($TEXT_COLOR $RED)Go is not installed!${RESET}"
     exit
   fi
+
   what_shell_profile
   what_installed_version
   echo "$($TEXT_COLOR $RED)removing $INSTALLED_VERSION${RESET} from ${GOROOT}"
 
-  rm -r "$GOROOT"
-
-  if [[ $? -ne 0 ]]; then
+  if ! rm -r "$GOROOT"; then
     echo "$($TEXT_COLOR $RED)Couldn't remove Go${RESET}."
     echo "Can't remove contents of $GOROOT"
     echo "Maybe you need to run the script with root privileges!"
@@ -131,9 +129,7 @@ function install_go() {
     tput smul
   )$VERSION${RESET})..."
 
-  wget --quiet --continue --show-progress "$latest_version_link"
-
-  if [ $? -ne 0 ]; then
+  if ! wget --quiet --continue --show-progress "$latest_version_link"; then
     echo "$($TEXT_COLOR $RED)Download failed!"
     exit 1
   fi
@@ -145,9 +141,9 @@ function install_go() {
 
   mkdir -p "$GOPATH"/{src,pkg,bin} "$GOROOT"
 
-  echo "Extracting files to $GOROOT..."
+  echo "Extracting $latest_version_file_name files to $GOROOT..."
 
-  tar -xzf "$file_name"
+  tar -xzf "$latest_version_file_name"
 
   mv go/* "$GOROOT"
   rmdir go
@@ -162,7 +158,6 @@ function install_go() {
   } >>"$HOME/.${shell_profile}"
 
   eval "$CLEAR_UP"
-
 }
 
 function echo_finding() {
@@ -186,7 +181,9 @@ function update_go() {
     echo "$($TEXT_COLOR $BLUE)Exiting, Bye!${RESET}"
     exit
   fi
+
   echo "Updating will remove the current installed version from $GOROOT."
+
   if [[ $1 == "update" ]]; then
     # update is used to force update for testing on travis
     # bypass read option
