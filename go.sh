@@ -62,9 +62,9 @@ function extract_version_from() {
 
 function find_latest_version_link() {
   file_name="go$version_regex.$platform.tar.gz"
-  link_regex="https://dl.google.com/go/$file_name"
+  link_regex="/dl/$file_name"
 
-  latest_version_link=$(
+  latest_version_link=$(echo -n "https://golang.org"
     wget -qO- https://golang.org/dl/ | # get the HTML of golang page
       grep -o "$link_regex" | # select installation links
       head -1 # only get the first link i.e.(latest version)
