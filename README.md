@@ -21,8 +21,8 @@
 You can clone the repository or just use `wget` to download the script
 
 ```bash
-wget https://raw.githubusercontent.com/kerolloz/go-installer/master/go.sh
-bash go.sh
+wget https://git.io/go-installer
+bash go-installer
 ```
 
 Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the magic happen! :crystal_ball:
