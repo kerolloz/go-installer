@@ -18,11 +18,18 @@
 
 ### Installing(or updating) Go :arrow_down:
 
-You can clone the repository or just use `wget` to download the script
+You can _clone_ the repository then run `bash go.sh`.
+
+Or by simply running whatever suits you from the following commands (`wget` or `curl`):
 
 ```bash
-wget https://git.io/go-installer
-bash go-installer
+# downloads then runs the script
+wget https://git.io/go-installer.sh && bash go-installer.sh
+```
+
+```bash
+# doesn't save the script ~ runs the script directly from stdout 
+curl -sL https://git.io/go-installer | bash
 ```
 
 Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the magic happen! :crystal_ball:
