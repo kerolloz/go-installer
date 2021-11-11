@@ -20,7 +20,9 @@
 
 You can _clone_ the repository then run `bash go.sh`.
 
-Or by simply running whatever suits you from the following commands (`wget` or `curl`):
+Or by simply running whatever suits you from the following commands (`wget`[^1] or `curl`):
+
+[^1]: the script depends on wget ([1](https://git.io/dt_2021-11-11_163711), [2](https://git.io/dt_2021-11-11_163722))
 
 ```bash
 # downloads then runs the script
@@ -65,9 +67,9 @@ The script does the following steps:
 - checks if you have already installed Go!
 - automatically checks the installed operating system (Linux or Mac)
 - detects system architecture (armv6, armv8, amd64, i386)
-- parses the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
+- parses[^1] the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
 - in case of having **already installed Go**, if the latest and the current version are equal, the script **exits** :wave:
-- downloads the latest version
+- downloads[^1] the latest version
 - creates needed folders for workspace and Go binaries
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
