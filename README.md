@@ -34,7 +34,7 @@ wget https://git.io/go-installer.sh && bash go-installer.sh
 curl -sL https://git.io/go-installer | bash
 ```
 
-Now, You can go grab a cup of coffee :coffee:, set back :relieved: and watch the magic happen! :crystal_ball:
+Now, You can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
 
 #### Please Note that
 
