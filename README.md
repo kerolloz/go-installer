@@ -1,18 +1,14 @@
-<h1 align="center"> Go Installer 🐹 </h1>
+# Go Installer 🐹
+<img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="35%">
 
-<p align="center">
-  <a href="https://github.com/kerolloz/go-installer/issues">
-    <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-  </a>
+> Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.  
+<a href="https://github.com/kerolloz/go-installer/issues">
+  <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
+</a>
+<a href="https://travis-ci.com/kerolloz/go-installer">
+  <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
+</a>
 
-  <a href="https://travis-ci.com/kerolloz/go-installer">
-    <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
-  </a>
-  <br>
-  Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.
-  <img src="https://pilsniak.com/wp-content/uploads/2017/04/golang.jpg" width="50%">
-  
-</p>
 
 ## How to use it :thinking:
 
@@ -22,7 +18,7 @@ You can _clone_ the repository then run `bash go.sh`.
 
 Or by simply running whatever suits you from the following commands (`wget`[^1] or `curl`):
 
-[^1]: the script depends on wget ([1](https://git.io/dt_2021-11-11_163711), [2](https://git.io/dt_2021-11-11_163722))
+[^1]: the script depends on wget ([1](https://github.com/kerolloz/go-installer/blob/836e09a79411cda39879a0ce8f69f199f4423562/go.sh#L67-L71), [2](https://github.com/kerolloz/go-installer/blob/836e09a79411cda39879a0ce8f69f199f4423562/go.sh#L132))
 
 ```bash
 # downloads then runs the script
@@ -66,18 +62,18 @@ The script does the following steps:
 - checks if you have already installed Go!
 - detects the installed operating system (Linux or Mac)
 - detects system architecture (armv6, armv8, amd64, i386)
-- parses[^1] the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
+- parses the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
 - in the case of having **Go already installed**, if the latest and the current version are equal, the script will **exit** :wave:
-- downloads[^1] the latest version
+- downloads the latest version
 - creates the needed directories for workspace and Go binaries
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
 
 <p align="center">
-  <img src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
-  <blockquote>
-      <p align="center">WORKS LIKE A CHARM :rocket:</p>
-  </blockquote>
+  <picture>
+  <img  src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
+  </picture>
+  <p align="center">WORKS LIKE A CHARM :rocket:</p>
 </p>
 
 ## Tests
