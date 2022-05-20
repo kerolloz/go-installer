@@ -16,7 +16,7 @@
 
 ## How to use it :thinking:
 
-### Installing(or updating) Go :arrow_down:
+### Installing (or even _updating_) Go :arrow_down:
 
 You can _clone_ the repository then run `bash go.sh`.
 
@@ -30,18 +30,17 @@ wget https://git.io/go-installer.sh && bash go-installer.sh
 ```
 
 ```bash
-# doesn't save the script ~ runs the script directly from stdout 
+# doesn't download the script ~ runs the script directly from stdout 
 curl -sL https://git.io/go-installer | bash
 ```
 
-Now, You can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
+Now, you can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
 
-#### Please Note that
+> **Note**  
+> By default the script will create `.go` and `go` folders on your _HOME_ directory & add the needed variables to your _PATH_ variable.  
 
-By default the script will create `.go` and `go` folders on your _HOME_ directory, add the needed variables to your _PATH_ variable.
-
-`$HOME/.go is location where Go will be installed to.`  
-`$HOME/go is the default workspace.`
+`$HOME/.go` is the location where Go will be installed to.   
+`$HOME/go` is the default workspace.
 
 In order to install Go to other location or set custom workspace. You can set environment variables GOROOT or GOPATH before installing (or uninstalling) Go.
 
@@ -65,17 +64,16 @@ bash go.sh remove
 The script does the following steps:
 
 - checks if you have already installed Go!
-- automatically checks the installed operating system (Linux or Mac)
+- detects the installed operating system (Linux or Mac)
 - detects system architecture (armv6, armv8, amd64, i386)
 - parses[^1] the [golang](https://golang.org/dl) download page to find the latest version of Go that is available for your platform and architecture
-- in case of having **already installed Go**, if the latest and the current version are equal, the script **exits** :wave:
+- in the case of having **Go already installed**, if the latest and the current version are equal, the script will **exit** :wave:
 - downloads[^1] the latest version
-- creates needed folders for workspace and Go binaries
+- creates the needed directories for workspace and Go binaries
 - extracts the files of the downloaded package
 - adds the binaries to PATH environmental variable
 
 <p align="center">
-
   <img src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
   <blockquote>
       <p align="center">WORKS LIKE A CHARM :rocket:</p>
