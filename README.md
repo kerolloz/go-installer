@@ -1,4 +1,9 @@
-# Go Installer 🐹
+<h1 align="left">Go Installer 🐹
+  <a target="_blank" href="https://kounter.tk">
+    <img align="right" src="https://t.ly/qgt4" />
+  </a>
+</h1>
+
 <img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="35%">
 
 > Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.  
@@ -8,7 +13,6 @@
 <a href="https://travis-ci.com/kerolloz/go-installer">
   <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
 </a>
-
 
 ## How to use it :thinking:
 
