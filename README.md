@@ -49,7 +49,7 @@ export GOROOT=/opt/go            # where Go is installed
 export GOPATH=$HOME/projects/go  # your workspace
 ```
 
-Read more about [workspaces](https://golang.org/doc/code.html#Workspaces) in Go.
+Read more about [workspaces](https://go.dev/doc/code.html#Workspaces) in Go.
 
 ### Uninstalling Go ❌
 
