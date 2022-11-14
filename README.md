@@ -10,9 +10,6 @@
 <a href="https://github.com/kerolloz/go-installer/issues">
   <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
 </a>
-<a href="https://travis-ci.com/kerolloz/go-installer">
-  <img src="https://travis-ci.com/kerolloz/go-installer.svg?branch=master">
-</a>
 
 ## How to use it :thinking:
 
@@ -79,18 +76,6 @@ The script does the following steps:
   </picture>
   <p align="center">WORKS LIKE A CHARM :rocket:</p>
 </p>
-
-## Tests
-
-Tested by Travis :heavy_check_mark: on:
-
-- Linux :penguin:
-- Mac :computer:
-
-Tested manually on:
-
-- Ubuntu
-- Manjaro
 
 ## License
 
