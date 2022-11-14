@@ -27,7 +27,7 @@ function what_platform() {
     "armv6")
       arch=armv6l
       ;;
-    "armv8")
+    "armv8" | "aarch64")
       arch=arm64
       ;;
     .*386.*)
