@@ -72,9 +72,7 @@ The script does the following steps:
 - Adds the binaries to PATH environment variable.
 
 <p align="center">
-  <picture>
   <img  src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
-  </picture>
   <p align="center">🔥 WORKS LIKE A CHARM 🚀</p>
 </p>
 
