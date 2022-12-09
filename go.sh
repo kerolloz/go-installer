@@ -254,11 +254,6 @@ function main() {
   elif [[ $# == 2 ]]; then
     case $1 in
     "--version")
-      if ! [[ $2 =~ $version_regex ]]; then
-        echo "$($TEXT_COLOR $RED)Invalid version '$2'${RESET}"
-        print_help
-        exit 1
-      fi
       version_regex=$2
       is_latest_version="no"
       ;;
