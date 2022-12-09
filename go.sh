@@ -167,7 +167,7 @@ function install_go() {
 
 function echo_finding() {
   finding="Finding latest version"
-  [[ $is_latest_version == "no" ]] && finding="You choose to install version $version_regex"
+  [[ $is_latest_version == "no" ]] && finding="You chose to install version $version_regex"
   echo "$finding of $($TEXT_COLOR $CYAN)Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
 }
 
