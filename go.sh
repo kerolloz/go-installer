@@ -13,6 +13,7 @@ BACKGROUND_COLOR="tput setab "
 CLEAR_UP="#tput cuu 1; tput ed;"
 
 version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
+is_latest_version="yes"
 
 function what_platform() {
   os="$(uname -s)"
@@ -60,17 +61,19 @@ function extract_version_from() {
   echo "$version"
 }
 
-function find_latest_version_link() {
+function find_version_link() {
   file_name="go$version_regex.$platform.tar.gz"
   link_regex="dl/$file_name"
+  go_website="https://go.dev/"
 
-  latest_version_link="https://go.dev/$(
-    wget -qO- https://go.dev/dl/ | # get the HTML of golang page
+  latest_version_link="$go_website$(
+    wget -qO- "$go_website/dl/" | # get the HTML of golang page
       grep -o "$link_regex" | # select installation links
       head -1 # only get the first link i.e.(latest version)
   )"
 
   latest_version_file_name=$(grep -o "$file_name" <<<"$latest_version_link")
+  [[ -z $latest_version_file_name ]] && echo "$($TEXT_COLOR $RED)Couldn't find $file_name on $go_website${RESET}" && exit 1
 }
 
 function go_exists() {
@@ -124,7 +127,9 @@ function install_go() {
   eval "$CLEAR_UP"
 
   VERSION=$(extract_version_from "$latest_version_link")
-  echo "Downloading $($TEXT_COLOR $CYAN)Go ${RESET}latest version($(
+  version_name="latest version"
+  [[ $is_latest_version == "no" ]] && version_name="version"
+  echo "Downloading $($TEXT_COLOR $CYAN)Go${RESET} $version_name ($(
     $BACKGROUND_COLOR $BLACK
     tput smul
   )$VERSION${RESET})..."
@@ -161,7 +166,9 @@ function install_go() {
 }
 
 function echo_finding() {
-  echo "Finding latest version of $($TEXT_COLOR $CYAN)Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
+  finding="Finding latest version"
+  [[ $is_latest_version == "no" ]] && finding="You choose to install version $version_regex"
+  echo "$finding of $($TEXT_COLOR $CYAN)Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
 }
 
 function update_go() {
@@ -211,13 +218,13 @@ function update_go() {
 
 function print_help() {
   echo -e "\n$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, upgrade or uninstall Go\n"
-  echo -e "[USAGE]\n\t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\tInstalls or upgrades Go (if already installed)"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\tUninstalls the currently installed version of Go"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\tPrints this help message"
+  echo -e "[USAGE]\n\t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or upgrades Go (if already installed)"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls the specified version of Go"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the currently installed version of Go"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message"
 }
 
 function print_welcome() {
-
   echo "$($TEXT_COLOR $CYAN)
   ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
  / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
@@ -225,7 +232,6 @@ function print_welcome() {
 | |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
  \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
  ${RESET}"
-
 }
 
 function main() {
@@ -245,11 +251,27 @@ function main() {
       exit
       ;;
     esac
+  elif [[ $# == 2 ]]; then
+    case $1 in
+    "--version")
+      if ! [[ $2 =~ $version_regex ]]; then
+        echo "$($TEXT_COLOR $RED)Invalid version '$2'${RESET}"
+        print_help
+        exit 1
+      fi
+      version_regex=$2
+      is_latest_version="no"
+      ;;
+    *)
+      print_help
+      exit
+      ;;
+    esac
   fi
 
   what_platform
   echo_finding
-  find_latest_version_link
+  find_version_link
 
   if go_exists -eq 0; then
     echo "Go exists"
