@@ -51,6 +51,15 @@ export GOPATH=$HOME/projects/go  # your workspace
 
 Read more about [workspaces](https://go.dev/doc/code.html#Workspaces) in Go.
 
+### Specifying a version to install 🧐
+
+By default the script installs the lastest version available.  
+You can choose what version to install by adding the `--version` flag, followed by the version you want to install.
+
+```
+bash go.sh --version 1.19.4
+```
+
 ### Uninstalling Go ❌
 
 ```bash
