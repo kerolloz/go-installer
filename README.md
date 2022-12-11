@@ -8,10 +8,8 @@
 
 > Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.  
 
-<a href="https://github.com/kerolloz/go-installer/issues">
-  <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat">
-</a>
-
+![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
+[![.github/workflows/test.yml](https://github.com/kerolloz/go-installer/actions/workflows/test.yml/badge.svg)](https://github.com/kerolloz/go-installer/actions/workflows/test.yml)
 ## How to use it 🤔
 
 ### Installing (or even _updating_) Go ⬇️

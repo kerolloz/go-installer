@@ -1,0 +1,13 @@
+name: Testing
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-go-installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Testing
+        run: ./test.sh
