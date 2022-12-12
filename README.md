@@ -10,6 +10,7 @@
 
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 [![.github/workflows/test.yml](https://github.com/kerolloz/go-installer/actions/workflows/test.yml/badge.svg)](https://github.com/kerolloz/go-installer/actions/workflows/test.yml)
+
 ## How to use it 🤔
 
 ### Installing (or even _updating_) Go ⬇️
@@ -57,6 +58,14 @@ You can choose what version to install by adding the `--version` flag, followed 
 ```
 bash go.sh --version 1.19.4
 ```
+
+### Show Help Message 🍁
+
+To show the following help message use `bash go.sh help`.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/36763164/207093802-78d36aa3-dfe7-456e-9425-3ad724e45a84.png" />
+</p>
 
 ### Uninstalling Go ❌
 
