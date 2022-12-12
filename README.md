@@ -78,10 +78,9 @@ The script does the following steps:
 - Extracts the files of the downloaded package.
 - Adds the binaries to PATH environment variable.
 
-<p align="center">
-  <img  src="https://media.giphy.com/media/U7PEFPIq1GrgSg4j5j/source.gif" width="80%">
-  <p align="center">🔥 WORKS LIKE A CHARM 🚀</p>
-</p>
+https://user-images.githubusercontent.com/36763164/207081927-4cfc15bd-5b90-4b5e-9391-ed16b107eca8.mp4
+
+<p align="center">🔥 WORKS LIKE A CHARM 🚀</p>
 
 ## License
 
