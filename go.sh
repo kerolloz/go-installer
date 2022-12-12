@@ -13,7 +13,26 @@ BACKGROUND_COLOR="tput setab "
 CLEAR_UP="#tput cuu 1; tput ed;"
 
 version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
+VERSION_REGEX="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
 is_latest_version="yes"
+
+function print_welcome() {
+  echo "$($TEXT_COLOR $CYAN)
+  ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
+ / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
+| |  _| | | |_____| ||  \| \___ \ | | / _ \ | |   | |   |  _| | |_) |
+| |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
+ \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
+ ${RESET}"
+}
+
+function print_help() {
+  echo -e "\n$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, upgrade or uninstall Go\n"
+  echo -e "[USAGE]\n\t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or upgrades Go (if already installed)"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls the specified version of Go"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the currently installed version of Go"
+  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message"
+}
 
 function what_platform() {
   os="$(uname -s)"
@@ -57,7 +76,7 @@ function what_installed_version() {
 
 function extract_version_from() {
   local version
-  version=$(grep -o "$version_regex" <<<"$1")
+  version=$(grep -o "$VERSION_REGEX" <<<"$1")
   echo "$version"
 }
 
@@ -180,23 +199,23 @@ function update_go() {
 
   eval "$CLEAR_UP"
   echo -e "          VERSION"
-  echo -e "CURRENT:  $current"
-  echo -e "LATEST:   $latest"
+  echo -e "CURRENT:   $current"
+  echo -e "CHOSEN:    $latest"
 
   if [[ $current == "$latest" ]]; then
-    echo "You already have the latest version of $($TEXT_COLOR $CYAN)Go${RESET} Installed!"
+    echo "You already have that version of $($TEXT_COLOR $CYAN)Go${RESET} Installed!"
     echo "$($TEXT_COLOR $BLUE)Exiting, Bye!${RESET}"
     exit
   fi
 
-  echo "Updating will remove the current installed version from $GOROOT."
+  echo "Installing will remove the current installed version from '$GOROOT'"
 
   if [[ $1 == "update" ]]; then
     # update is used to force update for testing on travis
     # bypass read option
     option=""
   else
-    echo -e "Do you want to update to Go(${latest})? [ENTER(yes)/n]: \c"
+      echo -e "Do you want to install $($TEXT_COLOR $GREEN)Go($latest)${RESET} and remove $($TEXT_COLOR $RED)Go($current)${RESET}? [ENTER(yes)/n]: \c"
     read -r option
   fi
 
@@ -214,24 +233,6 @@ function update_go() {
     ;;
   esac
 
-}
-
-function print_help() {
-  echo -e "\n$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, upgrade or uninstall Go\n"
-  echo -e "[USAGE]\n\t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or upgrades Go (if already installed)"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls the specified version of Go"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the currently installed version of Go"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message"
-}
-
-function print_welcome() {
-  echo "$($TEXT_COLOR $CYAN)
-  ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
- / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
-| |  _| | | |_____| ||  \| \___ \ | | / _ \ | |   | |   |  _| | |_) |
-| |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
- \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
- ${RESET}"
 }
 
 function main() {
