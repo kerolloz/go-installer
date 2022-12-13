@@ -87,7 +87,7 @@ The script does the following steps:
 - Extracts the files of the downloaded package.
 - Adds the binaries to PATH environment variable.
 
-https://user-images.githubusercontent.com/36763164/207081927-4cfc15bd-5b90-4b5e-9391-ed16b107eca8.mp4
+https://user-images.githubusercontent.com/36763164/207317882-7e50e2de-628e-43f0-bf7c-bee6b1e68001.mp4
 
 <p align="center">🔥 WORKS LIKE A CHARM 🚀</p>
 
