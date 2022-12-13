@@ -265,6 +265,9 @@ function main() {
       exit
       ;;
     esac
+  elif [[ $# > 2 ]]; then
+      print_help
+      exit
   fi
 
   what_platform
