@@ -17,21 +17,23 @@ VERSION_REGEX="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
 is_latest_version="yes"
 
 function print_welcome() {
-  echo "$($TEXT_COLOR $CYAN)
-  ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
- / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
-| |  _| | | |_____| ||  \| \___ \ | | / _ \ | |   | |   |  _| | |_) |
-| |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
- \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
- ${RESET}"
+  echo -e "$($TEXT_COLOR $CYAN)
+\t  ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
+\t / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
+\t| |  _| | | |_____| ||  \| \___ \ | | / _ \ | |   | |   |  _| | |_) |
+\t| |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
+\t \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
+\t ${RESET}"
 }
 
 function print_help() {
-  echo -e "\n$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, upgrade or uninstall Go\n"
-  echo -e "[USAGE]\n\t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or upgrades Go (if already installed)"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls the specified version of Go"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the currently installed version of Go"
-  echo -e "\t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message"
+  echo -e "\t$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, update or uninstall Go\n
+  \t$($TEXT_COLOR $GREEN)-------------------------------  Usage  -------------------------------\n
+  \t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or update Go (if installed)
+  \t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls a specific version of Go
+  \t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the installed version of Go
+  \t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message
+  "
 }
 
 function what_platform() {

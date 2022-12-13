@@ -64,7 +64,7 @@ bash go.sh --version 1.19.4
 To show the following help message use `bash go.sh help`.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/36763164/207093802-78d36aa3-dfe7-456e-9425-3ad724e45a84.png" />
+  <img src="https://user-images.githubusercontent.com/36763164/207301551-c686e069-df78-4d28-af78-bedd02b36354.gif" />
 </p>
 
 ### Uninstalling Go ❌
