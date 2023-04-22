@@ -90,7 +90,3 @@ The script does the following steps:
 https://user-images.githubusercontent.com/36763164/207317882-7e50e2de-628e-43f0-bf7c-bee6b1e68001.mp4
 
 <p align="center">🔥 WORKS LIKE A CHARM 🚀</p>
-
-## License
-
-[MIT License](/LICENSE.md)
