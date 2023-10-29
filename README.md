@@ -1,6 +1,6 @@
 <h1 align="left">Go Installer 🐹
-  <a target="_blank" href="https://kounter.tk">
-    <img align="right" src="https://t.ly/qgt4" />
+  <a target="_blank" href="https://kounter.kerolloz.dev">
+    <img align="right" src="https://t.ly/fvGzM" />
   </a>
 </h1>
 
