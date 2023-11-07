@@ -124,10 +124,10 @@ function remove() {
   echo "Creating a backup of your ${RC_PROFILE} to ${RC_PROFILE}-BACKUP"
   cp "$RC_PROFILE" "${RC_PROFILE}-BACKUP"
   echo "Removing exports for GOROOT & GOPATH from ${RC_PROFILE}"
-  sed -i '/export GOROOT/d' "${RC_PROFILE}"
-  sed -i '/:$GOROOT/d' "${RC_PROFILE}"
-  sed -i '/export GOPATH/d' "${RC_PROFILE}"
-  sed -i '/:$GOPATH/d' "${RC_PROFILE}"
+  sed -i'' -e '/export GOROOT/d' "${RC_PROFILE}"
+  sed -i'' -e '/:$GOROOT/d' "${RC_PROFILE}"
+  sed -i'' -e '/export GOPATH/d' "${RC_PROFILE}"
+  sed -i'' -e '/:$GOPATH/d' "${RC_PROFILE}"
 
   echo "$($TEXT_COLOR $GREEN)Uninstalled Go Successfully!${RESET}"
 }
