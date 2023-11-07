@@ -1,12 +1,16 @@
-name: Testing
+name: Testing Go Installer
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
-  test-go-installer:
-    runs-on: ubuntu-latest
+  os_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
       - name: Testing
