@@ -111,7 +111,7 @@ function remove() {
   what_installed_version
   echo "$($TEXT_COLOR $RED)removing $INSTALLED_VERSION${RESET} from ${GOROOT}"
 
-  if ! rm -r "$GOROOT"; then
+  if ! rm -r -f "$GOROOT"; then
     echo "$($TEXT_COLOR $RED)Couldn't remove Go${RESET}."
     echo "Can't remove contents of $GOROOT"
     echo "Maybe you need to run the script with root privileges!"
