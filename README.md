@@ -1,6 +1,6 @@
 <h1 align="left">Go Installer 🐹
   <a target="_blank" href="https://kounter.kerolloz.dev">
-    <img align="right" src="https://t.ly/fvGzM" />
+    <img align="right" src="https://kounter.kerolloz.dev/badge/kerolloz.go-installer?style=for-the-badge&color=69d7e4&label=Views&labelColor=69d7e4" />
   </a>
 </h1>
 
