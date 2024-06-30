@@ -4,7 +4,7 @@
   </a>
 </h1>
 
-<img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="35%">
+<img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="33%">
 
 > Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.  
 
@@ -15,7 +15,7 @@
 
 ### Installing (or even _updating_) Go ⬇️
 
-You can _clone_ the repository then run `bash go.sh`.
+You can _clone_ the repository and then run `bash go.sh`.
 
 Or by simply running whatever suits you from the following commands (`wget`[^1] or `curl`):
 
@@ -36,10 +36,10 @@ Now, you can go grab a cup of coffee :coffee:, sit back :relieved: and relax whi
 > **Note**  
 > By default the script will create `.go` and `go` folders on your _HOME_ directory & add the needed variables to your _PATH_ variable.  
 
-`$HOME/.go` is the location where Go will be installed to.
+`$HOME/.go` is where Go will be installed.
 `$HOME/go` is the default workspace.
 
-In order to install Go to other location or set custom workspace. You can set environment variables GOROOT or GOPATH before installing (or uninstalling) Go.
+In order to install Go to another location or set custom workspace. You can set environment variables GOROOT or GOPATH before installing (or uninstalling) Go.
 
 For example:
 
@@ -52,7 +52,7 @@ Read more about [workspaces](https://go.dev/doc/code.html#Workspaces) in Go.
 
 ### Specifying a version to install 🧐
 
-By default the script installs the lastest version available.  
+By default, the script installs the latest version available.  
 You can choose what version to install by adding the `--version` flag, followed by the version you want to install.
 
 ```
@@ -86,6 +86,7 @@ The script does the following steps:
 - Creates the needed directories for workspace and Go binaries.
 - Extracts the files of the downloaded package.
 - Adds the binaries to PATH environment variable.
+- Removes the downloaded installation file.
 
 https://user-images.githubusercontent.com/36763164/207317882-7e50e2de-628e-43f0-bf7c-bee6b1e68001.mp4
 
