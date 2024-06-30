@@ -237,6 +237,10 @@ function update_go() {
 
 }
 
+function remove_downloaded_package() {
+  rm -f "$latest_version_file_name"
+}
+
 function main() {
   print_welcome
 
@@ -282,6 +286,7 @@ function main() {
   fi
 
   test_installation
+  remove_downloaded_package
 }
 
 main "$@"
