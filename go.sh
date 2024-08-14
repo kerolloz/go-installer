@@ -155,7 +155,11 @@ function install_go() {
     tput smul
   )$VERSION${RESET})..."
 
-  if ! wget --quiet --continue --show-progress "$latest_version_link"; then
+  # wget2 v2.1.0 changed --show-progress to --force-progress, so we need to check which one to use
+  progress_arg="--show-progress"
+  wget --help | grep -q -- --force-progress && progress_arg="--force-progress"
+
+  if ! wget --quiet --continue $progress_arg "$latest_version_link"; then
     echo "$($TEXT_COLOR $RED)Download failed!"
     exit 1
   fi
