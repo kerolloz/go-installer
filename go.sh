@@ -90,15 +90,28 @@ function extract_version_from() {
   echo "$version"
 }
 
+function get_download_command() {
+  if command -v curl &>/dev/null; then
+    echo "curl -s"
+  elif command -v wget &>/dev/null; then
+    echo "wget -qO-"
+  else
+    echo "$($TEXT_COLOR $RED)Error: Neither curl nor wget is available. Please install one of them.${RESET}" >&2
+    exit 1
+  fi
+}
+
 function find_version_link() {
   file_name="go$version_regex.$platform.tar.gz"
   link_regex="dl/$file_name"
   go_website="https://go.dev/"
 
+  download_command=$(get_download_command)
+
   latest_version_link="$go_website$(
-    wget -qO- "$go_website/dl/" | # get the HTML of golang page
-      grep -o "$link_regex" | # select installation links
-      head -1 # only get the first link i.e.(latest version)
+    $download_command "$go_website/dl/" | # get the HTML of golang page
+      grep -o "$link_regex" |             # select installation links
+      head -1                             # only get the first link i.e.(latest version)
   )"
 
   latest_version_file_name=$(grep -o "$file_name" <<<"$latest_version_link")
@@ -163,13 +176,22 @@ function install_go() {
     tput smul
   )$VERSION${RESET})..."
 
-  # wget2 v2.1.0 changed --show-progress to --force-progress, so we need to check which one to use
-  progress_arg="--show-progress"
-  wget --help | grep -q -- --force-progress && progress_arg="--force-progress"
+  download_command=$(get_download_command)
 
-  if ! wget --quiet --continue $progress_arg "$latest_version_link"; then
-    echo "$($TEXT_COLOR $RED)Download failed!"
-    exit 1
+  if [[ $download_command == "curl -s" ]]; then
+    if ! curl -fSL --progress-bar "$latest_version_link" -o "$latest_version_file_name"; then
+      echo "$($TEXT_COLOR $RED)Download failed!${RESET}"
+      exit 1
+    fi
+  else
+    # wget2 v2.1.0 changed --show-progress to --force-progress, so we need to check which one to use
+    progress_arg="--show-progress"
+    wget --help | grep -q -- --force-progress && progress_arg="--force-progress"
+
+    if ! wget --quiet --continue $progress_arg "$latest_version_link"; then
+      echo "$($TEXT_COLOR $RED)Download failed!${RESET}"
+      exit 1
+    fi
   fi
 
   [ -z "$GOROOT" ] && GOROOT="$HOME/.go"
@@ -229,7 +251,7 @@ function update_go() {
     # bypass read option
     option=""
   else
-      echo -e "Do you want to install $($TEXT_COLOR $GREEN)Go($latest)${RESET} and remove $($TEXT_COLOR $RED)Go($current)${RESET}? [ENTER(yes)/n]: \c"
+    echo -e "Do you want to install $($TEXT_COLOR $GREEN)Go($latest)${RESET} and remove $($TEXT_COLOR $RED)Go($current)${RESET}? [ENTER(yes)/n]: \c"
     read -r option
   fi
 
@@ -282,8 +304,8 @@ function main() {
       ;;
     esac
   elif [[ $# > 2 ]]; then
-      print_help
-      exit
+    print_help
+    exit
   fi
 
   what_platform

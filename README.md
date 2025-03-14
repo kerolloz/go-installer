@@ -6,7 +6,7 @@
 
 <img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="33%">
 
-> Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.  
+> Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.
 
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 [![.github/workflows/test.yml](https://github.com/kerolloz/go-installer/actions/workflows/test.yml/badge.svg)](https://github.com/kerolloz/go-installer/actions/workflows/test.yml)
@@ -17,9 +17,7 @@
 
 You can _clone_ the repository and then run `bash go.sh`.
 
-Or by simply running whatever suits you from the following commands (`wget`[^1] or `curl`):
-
-[^1]: the script depends on wget ([1](https://github.com/kerolloz/go-installer/blob/836e09a79411cda39879a0ce8f69f199f4423562/go.sh#L67-L71), [2](https://github.com/kerolloz/go-installer/blob/836e09a79411cda39879a0ce8f69f199f4423562/go.sh#L132))
+Or by simply running whatever suits you from the following commands (`wget` or `curl`):
 
 ```bash
 # downloads then runs the script
@@ -27,14 +25,14 @@ wget https://git.io/go-installer.sh && bash go-installer.sh
 ```
 
 ```bash
-# doesn't download the script ~ runs the script directly 
+# doesn't download the script ~ runs the script directly
 bash <(curl -sL https://git.io/go-installer)
 ```
 
 Now, you can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
 
 > **Note**  
-> By default the script will create `.go` and `go` folders on your _HOME_ directory & add the needed variables to your _PATH_ variable.  
+> By default the script will create `.go` and `go` folders on your _HOME_ directory & add the needed variables to your _PATH_ variable.
 
 `$HOME/.go` is where Go will be installed.
 `$HOME/go` is the default workspace.
