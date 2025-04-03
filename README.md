@@ -6,16 +6,27 @@
 
 <img align="right" src="https://user-images.githubusercontent.com/36763164/169433445-04f8485b-aa8d-45d0-a3cf-6e69c6456b2f.png" width="33%">
 
-> Install Golang on Linux or Mac <strike>with hassle of environment variables setting</strike>.
+> Install Golang on Linux, Mac or Windows <strike>with hassle of environment variables setting</strike>.
 
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)
 [![.github/workflows/test.yml](https://github.com/kerolloz/go-installer/actions/workflows/test.yml/badge.svg)](https://github.com/kerolloz/go-installer/actions/workflows/test.yml)
 
-## How to use it 🤔
+## How to use it (Linux/MacOS) 🤔
 
 ### Installing (or even _updating_) Go ⬇️
 
-You can _clone_ the repository and then run `bash go.sh`.
+You can _clone_ the repository and then choose how you want to run the script:
+
+```shell
+git clone
+cd go-installer
+```
+
+- By running the script directly:
+
+    * Linux: `bash go.sh`
+    * MacOS: `./go.sh`
+    * Windows: `.\go.ps1`
 
 Or by simply running whatever suits you from the following commands (`wget` or `curl`):
 
@@ -31,13 +42,13 @@ bash <(curl -sL https://git.io/go-installer)
 
 Now, you can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
 
-> **Note**  
+> **Note**
 > By default the script will create `.go` and `go` folders on your _HOME_ directory & add the needed variables to your _PATH_ variable.
 
 `$HOME/.go` is where Go will be installed.
 `$HOME/go` is the default workspace.
 
-In order to install Go to another location or set custom workspace. You can set environment variables GOROOT or GOPATH before installing (or uninstalling) Go.
+To install Go to another location or set a custom workspace, set the environment variables `GOROOT` or `GOPATH` before installing (or uninstalling) Go.
 
 For example:
 
@@ -50,11 +61,19 @@ Read more about [workspaces](https://go.dev/doc/code.html#Workspaces) in Go.
 
 ### Specifying a version to install 🧐
 
-By default, the script installs the latest version available.  
+By default, the script installs the latest version available.
 You can choose what version to install by adding the `--version` flag, followed by the version you want to install.
 
-```
+```bash
 bash go.sh --version 1.19.4
+```
+
+### Checking if a specific version is installed 🔍
+
+You can check if a specific version of Go is installed by using the `--version check` flag, followed by the version you want to check.
+
+```bash
+bash go.sh --version check 1.19.4
 ```
 
 ### Show Help Message 🍁
@@ -70,6 +89,85 @@ To show the following help message use `bash go.sh help`.
 ```bash
 bash go.sh remove
 ```
+
+### Running Tests Locally with Docker 🐳
+
+You can run tests locally using Docker to ensure a consistent environment and prevent side-effects on your host system. On CI environments, tests will run normally.
+
+To run tests locally, simply use the `make test` command, and all the magic will happen:
+
+```bash
+make test
+```
+
+This command will build the Docker image and run the tests inside the Docker container.
+
+## How to use it (Windows) 🤔
+
+### Installing (or even _updating_) Go ⬇️
+
+```powershell
+.\go.ps1 -Command install
+```
+
+### Specifying a version to install 🧐
+
+```powershell
+.\go.ps1 -Command install -Version 1.19.2
+```
+
+### Checking if a specific version is installed 🔍
+
+```powershell
+.\go.ps1 -Command remove
+```
+
+### Uninstalling Go ❌
+
+```powershell
+.\go.ps1 -Command update
+```
+
+### Show Help Message 🍁
+
+```powershell
+.\go.ps1 -Command help
+```
+
+### Running Tests Locally with Docker 🐳
+
+```powershell
+.\go.ps1 -Command test
+```
+
+## Using Makefile for Common Tasks 🛠️
+
+A `Makefile` is provided to simplify common tasks. Here are some useful commands:
+
+- Linux/MacOS
+    - Install Go: `make install`
+    - Uninstall Go: `make uninstall`
+    - Check if a specific version is installed: `make check-version VERSION=1.19.4`
+    - Run tests: `make test`
+
+- Windows
+    - Install Go: `make install-windows`
+    - Uninstall Go: `make uninstall-windows`
+    - Check if a specific version is installed: `make check-version-windows VERSION=1.19.4`
+    - Run tests: `make test-windows`
+
+## How to Contribute 🤝
+
+1. Fork the repository.
+2. Clone the forked repository.
+3. Create a new branch.
+4. Make your changes.
+5. Commit your changes.
+6. Push the changes to your fork.
+7. Create a pull request.
+8. Star the repository.
+9. Wait for the pull request to be reviewed and merged.
+10. Celebrate 🎉
 
 ## How it works ⚙️
 
