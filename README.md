@@ -54,12 +54,12 @@ By default, the script installs the latest version available.
 You can choose what version to install by adding the `--version` flag, followed by the version you want to install.
 
 ```
-bash go.sh --version 1.19.4
+bash go-installer.sh --version 1.19.4
 ```
 
 ### Show Help Message 🍁
 
-To show the following help message use `bash go.sh help`.
+To show the following help message use `bash go-installer.sh help`.
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/36763164/207301551-c686e069-df78-4d28-af78-bedd02b36354.gif" />
@@ -68,7 +68,7 @@ To show the following help message use `bash go.sh help`.
 ### Uninstalling Go ❌
 
 ```bash
-bash go.sh remove
+bash go-installer.sh remove
 ```
 
 ## How it works ⚙️
