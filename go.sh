@@ -1,326 +1,427 @@
 #!/bin/bash
+set -euo pipefail
 
-# Color definitions for tput
-BLACK=0
-RED=1
-GREEN=2
-YELLOW=3
-BLUE=4
-CYAN=6
-RESET=$(tput sgr0)
-TEXT_COLOR="tput setaf "
-BACKGROUND_COLOR="tput setab "
-CLEAR_UP="#tput cuu 1; tput ed;"
+# ==============================================================================
+# 1. Bootstrap
+# ==============================================================================
+GOROOT="${GOROOT:-$HOME/.go}"
+GOPATH="${GOPATH:-$HOME/go}"
+GO_API="https://go.dev/dl/?mode=json"
+VERSION_RE='[0-9]+\.[0-9]+(\.[0-9]+)?'
 
-version_regex="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
-VERSION_REGEX="[[:digit:]]*\.[[:digit:]]*\.[[:digit:]]"
-is_latest_version="yes"
+OS="" ARCH="" PLATFORM=""
+SHELL_PROFILE=""
+FETCHER="" HASHER=""
+TEMP_DIR=""
 
-function print_welcome() {
-  echo -e "$($TEXT_COLOR $CYAN)
+DOWNLOAD_URL="" FILENAME="" CHECKSUM="" LATEST_VERSION=""
+ACTION="install" REQUESTED_VERSION=""
+
+RED="" GREEN="" YELLOW="" BLUE="" CYAN="" RESET=""
+
+setup_colors() {
+  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    RED=$(tput setaf 1) GREEN=$(tput setaf 2) YELLOW=$(tput setaf 3)
+    BLUE=$(tput setaf 4) CYAN=$(tput setaf 6) RESET=$(tput sgr0)
+  else
+    RED="" GREEN="" YELLOW="" BLUE="" CYAN="" RESET=""
+  fi
+}
+
+cleanup() { [ -n "${TEMP_DIR:-}" ] && [ -d "$TEMP_DIR" ] && rm -rf "$TEMP_DIR"; true; }
+trap cleanup EXIT INT TERM
+
+# ==============================================================================
+# 2. Platform Layer
+# ==============================================================================
+detect_os() {
+  case "$(uname -s)" in
+    Linux)  OS="linux" ;;
+    Darwin) OS="darwin" ;;
+    *)      die "Unsupported OS: $(uname -s)" ;;
+  esac
+}
+
+detect_arch() {
+  case "$(uname -m)" in
+    x86_64)        ARCH="amd64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+    armv6*)        ARCH="armv6l" ;;
+    *386*)         ARCH="386" ;;
+    *)             die "Unsupported architecture: $(uname -m)" ;;
+  esac
+  PLATFORM="${OS}-${ARCH}"
+}
+
+detect_shell_profile() {
+  [ -n "${SHELL_PROFILE:-}" ] && return 0
+  case "$(basename "${SHELL:-/bin/bash}")" in
+    zsh)  SHELL_PROFILE="$HOME/.zshrc" ;;
+    fish) SHELL_PROFILE="$HOME/.config/fish/config.fish" ;;
+    ksh)  SHELL_PROFILE="$HOME/.kshrc" ;;
+    bash)
+      if [ "$OS" = "darwin" ]; then
+        SHELL_PROFILE="$HOME/.bash_profile"
+      else
+        SHELL_PROFILE="$HOME/.bashrc"
+      fi
+      ;;
+    *)    SHELL_PROFILE="$HOME/.profile" ;;
+  esac
+}
+
+detect_tooling() {
+  if command -v curl >/dev/null 2>&1; then
+    FETCHER="curl"
+  elif command -v wget >/dev/null 2>&1; then
+    FETCHER="wget"
+  else
+    die "Neither curl nor wget found."
+  fi
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    HASHER="sha256sum"
+  elif command -v shasum >/dev/null 2>&1; then
+    HASHER="shasum"
+  elif command -v openssl >/dev/null 2>&1; then
+    HASHER="openssl"
+  else
+    HASHER=""
+  fi
+}
+
+# ==============================================================================
+# 3. I/O Layer
+# ==============================================================================
+log()  { printf '%b\n' "$1"; }
+warn() { printf '%b\n' "${YELLOW}WARNING:${RESET} $1" >&2; }
+err()  { printf '%b\n' "${RED}ERROR:${RESET} $1" >&2; }
+step() { printf '%b\n' "${CYAN}==>${RESET} $1"; }
+die()  { err "$1"; exit 1; }
+
+confirm() {
+  local msg="$1" default="${2:-n}"
+  if [ ! -t 0 ]; then
+    [ "$default" = "y" ] && return 0 || return 1
+  fi
+  local hint="[y/N]"
+  [ "$default" = "y" ] && hint="[Y/n]"
+  printf '%b ' "${YELLOW}${msg} ${hint}:${RESET}"
+  read -r ans
+  case "${ans:-$default}" in [Yy]*) return 0 ;; *) return 1 ;; esac
+}
+
+fetch() {
+  if [ "$FETCHER" = "curl" ]; then
+    curl -fsSL --connect-timeout 10 --max-time 30 "$1"
+  else
+    wget -qO- --timeout=30 "$1"
+  fi
+}
+
+download() {
+  local url="$1" out="$2"
+  if [ "$FETCHER" = "curl" ]; then
+    curl -fSL --progress-bar --connect-timeout 10 --max-time 300 "$url" -o "$out" || die "Download failed."
+  else
+    wget --timeout=300 "$url" -O "$out" || die "Download failed."
+  fi
+}
+
+compute_sha256() {
+  case "$HASHER" in
+    sha256sum) sha256sum "$1" | awk '{print $1}' ;;
+    shasum)    shasum -a 256 "$1" | awk '{print $1}' ;;
+    openssl)   openssl dgst -sha256 "$1" | awk '{print $NF}' ;;
+  esac
+}
+
+verify_checksum() {
+  local file="$1" expected="$2"
+  if [ -z "$expected" ]; then
+    warn "No checksum available for this release."
+    confirm "Proceed without verification?" "n" || die "Aborted."
+    return 0
+  fi
+  if [ -z "$HASHER" ]; then
+    warn "No hashing tool found (sha256sum, shasum, or openssl)."
+    confirm "Proceed without verification?" "n" || die "Aborted."
+    return 0
+  fi
+  step "Verifying checksum..."
+  local actual
+  actual=$(compute_sha256 "$file")
+  if [ "$actual" != "$expected" ]; then
+    die "Checksum mismatch.\nExpected: $expected\nActual:   $actual"
+  fi
+  log "${GREEN}Checksum verified.${RESET}"
+}
+
+extract_version() { grep -oE "$VERSION_RE" <<< "$1" | head -1; }
+
+resolve_release() {
+  local req="$1"
+  local url="$GO_API"
+  [ -n "$req" ] && url="${GO_API}&include=all"
+
+  step "Fetching release info..."
+  local json
+  json=$(fetch "$url") || die "Failed to reach Go release API."
+
+  if [ -n "$req" ]; then
+    FILENAME="go${req}.${PLATFORM}.tar.gz"
+    grep -q "\"filename\" *: *\"$FILENAME\"" <<< "$json" \
+      || die "No Go release found for version $req on platform $PLATFORM."
+  else
+    FILENAME=$(grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" <<< "$json" | head -1 | awk -F'"' '{print $4}') || true
+  fi
+
+  [ -z "$FILENAME" ] && die "No Go release found for ${req:+version $req on }$PLATFORM."
+
+  CHECKSUM=$(grep -A5 "\"filename\" *: *\"$FILENAME\"" <<< "$json" | grep -oE '"sha256" *: *"[a-f0-9]+"' | head -1 | awk -F'"' '{print $4}') || true
+  LATEST_VERSION="${req:-$(extract_version "$FILENAME")}"
+  DOWNLOAD_URL="https://go.dev/dl/${FILENAME}"
+}
+
+# ==============================================================================
+# 4. Action Layer
+# ==============================================================================
+download_and_stage() {
+  step "Downloading Go $LATEST_VERSION for $PLATFORM..."
+  local tarball="$TEMP_DIR/$FILENAME"
+  download "$DOWNLOAD_URL" "$tarball"
+  verify_checksum "$tarball" "$CHECKSUM"
+
+  step "Extracting..."
+  tar -xzf "$tarball" -C "$TEMP_DIR" || die "Extraction failed."
+  GOROOT="$TEMP_DIR/go" "$TEMP_DIR/go/bin/go" version >/dev/null 2>&1 || die "Staged binary failed to execute."
+}
+
+update_shell_profile() {
+  local begin_marker="# >>> go.sh managed block >>>"
+  local end_marker="# <<< go.sh managed block <<<"
+  local block
+
+  mkdir -p "$(dirname "$SHELL_PROFILE")"
+  [ -f "$SHELL_PROFILE" ] || touch "$SHELL_PROFILE"
+
+  case "$(basename "${SHELL:-/bin/bash}")" in
+    fish)
+      block=$(printf '%s\n' \
+        "$begin_marker" \
+        "set -gx GOROOT $GOROOT" \
+        "set -gx GOPATH $GOPATH" \
+        "set -gx PATH \$PATH $GOROOT/bin $GOPATH/bin" \
+        "$end_marker")
+      ;;
+    *)
+      block=$(printf '%s\n' \
+        "$begin_marker" \
+        "export GOROOT=$GOROOT" \
+        "export GOPATH=$GOPATH" \
+        'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin' \
+        "$end_marker")
+      ;;
+  esac
+
+  step "Updating $SHELL_PROFILE..."
+  if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
+    local tmpfile
+    tmpfile=$(mktemp 2>/dev/null || mktemp -t go-profile)
+    GO_BLOCK="$block" awk -v begin="$begin_marker" -v end="$end_marker" '
+      $0 == begin {
+        print ENVIRON["GO_BLOCK"]
+        in_block = 1
+        next
+      }
+      $0 == end {
+        in_block = 0
+        next
+      }
+      !in_block { print }
+    ' "$SHELL_PROFILE" > "$tmpfile"
+    mv "$tmpfile" "$SHELL_PROFILE"
+  else
+    printf '\n%s\n' "$block" >> "$SHELL_PROFILE"
+  fi
+}
+
+action_install() {
+  download_and_stage
+
+  step "Installing to $GOROOT..."
+  mkdir -p "$GOPATH"/{src,pkg,bin}
+  mkdir -p "$(dirname "$GOROOT")"
+  if [ -e "$GOROOT" ]; then
+    [ -d "$GOROOT" ] || die "$GOROOT exists and is not a directory."
+    rm -rf "$GOROOT" || die "Failed to remove existing $GOROOT."
+  fi
+  mv "$TEMP_DIR/go" "$GOROOT" || die "Failed to install to $GOROOT."
+
+  update_shell_profile
+
+  local v
+  v=$("$GOROOT/bin/go" version | grep -oE "$VERSION_RE" | head -1)
+  step "${GREEN}Go $v installed successfully.${RESET}"
+  log "Run: ${YELLOW}source $SHELL_PROFILE${RESET}"
+}
+
+action_update() {
+  local current
+
+  if [ ! -f "$GOROOT/bin/go" ]; then
+    die "No Go installation found at $GOROOT. Run without 'update' to install."
+  fi
+
+  current=$(extract_version "$("$GOROOT/bin/go" version 2>/dev/null || true)")
+
+  log "Installed: ${current:-none}"
+  log "Available: $LATEST_VERSION"
+
+  if [ "$current" = "$LATEST_VERSION" ]; then
+    step "Already on Go $current — nothing to do."
+    return 0
+  fi
+
+  confirm "Switch from $current to $LATEST_VERSION?" "y" || die "Cancelled."
+
+  download_and_stage
+
+  step "Backing up current installation..."
+  local backup="${GOROOT}.bak"
+  rm -rf "$backup"
+  mv "$GOROOT" "$backup" || die "Backup failed."
+
+  step "Installing new version..."
+  mkdir -p "$(dirname "$GOROOT")"
+  if mv "$TEMP_DIR/go" "$GOROOT"; then
+    rm -rf "$backup"
+    update_shell_profile
+    step "${GREEN}Updated to Go $LATEST_VERSION.${RESET}"
+  else
+    err "Install failed — rolling back..."
+    rm -rf "$GOROOT" 2>/dev/null
+    mv "$backup" "$GOROOT" || die "Rollback failed. Previous version at: $backup"
+    die "Update failed. Previous version restored."
+  fi
+}
+
+action_remove() {
+  step "Removing Go from $GOROOT..."
+
+  if [ "$GOROOT" = "/" ] || [ "$GOROOT" = "$HOME" ]; then
+    die "Refusing to remove suspicious GOROOT: $GOROOT"
+  fi
+  local depth
+  depth=$(printf '%s' "$GOROOT" | tr -cd '/' | wc -c | tr -d ' ')
+  [ "$depth" -lt 2 ] && die "Refusing to remove suspicious GOROOT: $GOROOT"
+
+  if [ ! -f "$GOROOT/bin/go" ]; then
+    step "No Go installation found at $GOROOT — nothing to do."
+    return 0
+  fi
+
+  if ! "$GOROOT/bin/go" version >/dev/null 2>&1; then
+    step "Go installation at $GOROOT is not usable — nothing to do."
+    return 0
+  fi
+
+  chmod -R u+w "$GOROOT" 2>/dev/null || true
+  rm -rf "$GOROOT" || die "Failed to remove $GOROOT."
+
+  if [ -f "$SHELL_PROFILE" ]; then
+    local begin_marker="# >>> go.sh managed block >>>"
+    local end_marker="# <<< go.sh managed block <<<"
+    if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
+      step "Cleaning $SHELL_PROFILE..."
+      local tmpfile
+      tmpfile=$(mktemp 2>/dev/null || mktemp -t go-profile)
+      cp "$SHELL_PROFILE" "${SHELL_PROFILE}.bak"
+      awk -v begin="$begin_marker" -v end="$end_marker" '
+        $0 == begin { in_block = 1; next }
+        $0 == end   { in_block = 0; next }
+        !in_block   { print }
+      ' "$SHELL_PROFILE" > "$tmpfile"
+      mv "$tmpfile" "$SHELL_PROFILE"
+    fi
+  fi
+
+  step "${GREEN}Go removed.${RESET}"
+}
+
+go_exists() { [ -x "$GOROOT/bin/go" ]; }
+
+# ==============================================================================
+# 5. Main
+# ==============================================================================
+print_banner() {
+  printf '%b' "${CYAN}
 \t  ____  ___       ___ _   _ ____ _____  _    _     _     _____ ____  
-\t / ___|/ _ \     |_ _| \ | / ___|_   _|/ \  | |   | |   | ____|  _ \ 
-\t| |  _| | | |_____| ||  \| \___ \ | | / _ \ | |   | |   |  _| | |_) |
-\t| |_| | |_| |_____| || |\  |___) || |/ ___ \| |___| |___| |___|  _ < 
-\t \____|\___/     |___|_| \_|____/ |_/_/   \_\_____|_____|_____|_| \_\\
-\t ${RESET}"
+\t / ___|/ _ \\     |_ _| \\ | / ___|_   _|/ \\  | |   | |   | ____|  _ \\ 
+\t| |  _| | | |_____| ||  \\| \\___ \\ | | / _ \\ | |   | |   |  _| | |_) |
+\t| |_| | |_| |_____| || |\\  |___) || |/ ___ \\| |___| |___| |___|  _ < 
+\t \\____|\\___/     |___|_| \\_|____/ |_/_/   \\_\\_____|_____|_____|_| \\_\\\\
+\t ${RESET}
+"
 }
 
-function print_help() {
-  echo -e "\t$($TEXT_COLOR $BLUE)go.sh${RESET} is a tool that helps you easily install, update or uninstall Go\n
-  \t$($TEXT_COLOR $GREEN)-------------------------------  Usage  -------------------------------\n
-  \t$($TEXT_COLOR $YELLOW)bash go.sh${RESET}\t\t\tInstalls or update Go (if installed)
-  \t$($TEXT_COLOR $YELLOW)bash go.sh --version [version]${RESET}\tInstalls a specific version of Go
-  \t$($TEXT_COLOR $YELLOW)bash go.sh remove${RESET}\t\tUninstalls the installed version of Go
-  \t$($TEXT_COLOR $YELLOW)bash go.sh help${RESET}\t\t\tPrints this help message
-  "
+print_help() {
+  cat <<EOF
+  ${BLUE}go.sh${RESET} — install, update, or remove Go
+
+  ${GREEN}Usage:${RESET}
+    ${YELLOW}bash go.sh${RESET}                      Install or update Go (latest)
+    ${YELLOW}bash go.sh --version <ver>${RESET}       Install a specific version
+    ${YELLOW}bash go.sh update${RESET}                Update to latest version
+    ${YELLOW}bash go.sh remove${RESET}                Uninstall Go
+    ${YELLOW}bash go.sh help${RESET}                  Show this message
+EOF
 }
 
-function what_platform() {
-  os="$(uname -s)"
-  arch="$(uname -m)"
-
-  case $os in
-  "Linux")
-    case $arch in
-    "x86_64")
-      arch=amd64
+parse_args() {
+  case "${1:-}" in
+    remove)          ACTION="remove" ;;
+    update)          ACTION="install" ;;
+    help|--help|-h)  ACTION="help" ;;
+    --version)
+      [ -n "${2:-}" ] || die "Usage: bash go.sh --version <version>"
+      REQUESTED_VERSION="$2"
       ;;
-    "armv6")
-      arch=armv6l
-      ;;
-    "armv8" | "aarch64")
-      arch=arm64
-      ;;
-    .*386.*)
-      arch=386
-      ;;
-    esac
-    platform="linux-$arch"
-    ;;
-  "Darwin")
-    case $arch in
-    "x86_64")
-      arch=amd64
-      ;;
-    "arm64")
-      arch=arm64
-      ;;
-    esac
-    platform="darwin-$arch"
-    ;;
+    "") ;;
+    *)  print_help; exit 1 ;;
   esac
 }
 
-function what_shell_profile() {
-  if [ -n "$($SHELL -c 'echo $ZSH_VERSION')" ]; then
-    shell_profile="zshrc"
-  elif [ -n "$($SHELL -c 'echo $BASH_VERSION')" ]; then
-    shell_profile="bashrc"
-  fi
-}
+main() {
+  setup_colors
+  parse_args "$@"
 
-function what_installed_version() {
-  INSTALLED_VERSION=$(go version)
-}
-
-function extract_version_from() {
-  local version
-  version=$(grep -o "$VERSION_REGEX" <<<"$1")
-  echo "$version"
-}
-
-function get_download_command() {
-  if command -v curl &>/dev/null; then
-    echo "curl -s"
-  elif command -v wget &>/dev/null; then
-    echo "wget -qO-"
-  else
-    echo "$($TEXT_COLOR $RED)Error: Neither curl nor wget is available. Please install one of them.${RESET}" >&2
-    exit 1
-  fi
-}
-
-function find_version_link() {
-  file_name="go$version_regex.$platform.tar.gz"
-  link_regex="dl/$file_name"
-  go_website="https://go.dev/"
-
-  download_command=$(get_download_command)
-
-  latest_version_link="$go_website$(
-    $download_command "$go_website/dl/" | # get the HTML of golang page
-      grep -o "$link_regex" |             # select installation links
-      head -1                             # only get the first link i.e.(latest version)
-  )"
-
-  latest_version_file_name=$(grep -o "$file_name" <<<"$latest_version_link")
-  [[ -z $latest_version_file_name ]] && echo "$($TEXT_COLOR $RED)Couldn't find $file_name on $go_website${RESET}" && exit 1
-}
-
-function go_exists() {
-  go version &>/dev/null
-}
-
-function remove() {
-  if ! go_exists; then
-    echo "$($TEXT_COLOR $RED)Go is not installed!${RESET}"
-    exit
-  fi
-
-  what_shell_profile
-  what_installed_version
-  echo "$($TEXT_COLOR $RED)removing $INSTALLED_VERSION${RESET} from ${GOROOT}"
-
-  if ! rm -r -f "$GOROOT"; then
-    echo "$($TEXT_COLOR $RED)Couldn't remove Go${RESET}."
-    echo "Can't remove contents of $GOROOT"
-    echo "Maybe you need to run the script with root privileges!"
-    echo "sudo bash go.sh"
-    exit 1
-  fi
-
-  RC_PROFILE="$HOME/.${shell_profile}"
-
-  echo "Creating a backup of your ${RC_PROFILE} to ${RC_PROFILE}-BACKUP"
-  cp "$RC_PROFILE" "${RC_PROFILE}-BACKUP"
-  echo "Removing exports for GOROOT & GOPATH from ${RC_PROFILE}"
-  sed -i'' -e '/export GOROOT/d' "${RC_PROFILE}"
-  sed -i'' -e '/:$GOROOT/d' "${RC_PROFILE}"
-  sed -i'' -e '/export GOPATH/d' "${RC_PROFILE}"
-  sed -i'' -e '/:$GOPATH/d' "${RC_PROFILE}"
-
-  echo "$($TEXT_COLOR $GREEN)Uninstalled Go Successfully!${RESET}"
-}
-
-function test_installation() {
-
-  if [ $? -ne 0 ]; then
-    echo "$($TEXT_COLOR $RED)Installation failed!!${RESET}"
-    exit 1
-  fi
-
-  echo "$($TEXT_COLOR $CYAN)Go${RESET} ($VERSION) has been installed $($TEXT_COLOR $GREEN)successfully!${RESET}"
-  echo "Open a new terminal(to re login) or you can do: $($TEXT_COLOR $YELLOW)source $HOME/.${shell_profile}${RESET}"
-}
-
-function install_go() {
-
-  eval "$CLEAR_UP"
-
-  VERSION=$(extract_version_from "$latest_version_link")
-  version_name="latest version"
-  [[ $is_latest_version == "no" ]] && version_name="version"
-  echo "Downloading $($TEXT_COLOR $CYAN)Go${RESET} $version_name ($(
-    $BACKGROUND_COLOR $BLACK
-    tput smul
-  )$VERSION${RESET})..."
-
-  download_command=$(get_download_command)
-
-  if [[ $download_command == "curl -s" ]]; then
-    if ! curl -fSL --progress-bar "$latest_version_link" -o "$latest_version_file_name"; then
-      echo "$($TEXT_COLOR $RED)Download failed!${RESET}"
-      exit 1
-    fi
-  else
-    # wget2 v2.1.0 changed --show-progress to --force-progress, so we need to check which one to use
-    progress_arg="--show-progress"
-    wget --help | grep -q -- --force-progress && progress_arg="--force-progress"
-
-    if ! wget --quiet --continue $progress_arg "$latest_version_link"; then
-      echo "$($TEXT_COLOR $RED)Download failed!${RESET}"
-      exit 1
-    fi
-  fi
-
-  [ -z "$GOROOT" ] && GOROOT="$HOME/.go"
-  [ -z "$GOPATH" ] && GOPATH="$HOME/go"
-
-  eval "$CLEAR_UP"
-
-  mkdir -p "$GOPATH"/{src,pkg,bin} "$GOROOT"
-
-  echo "Extracting $latest_version_file_name files to $GOROOT..."
-
-  tar -xzf "$latest_version_file_name"
-
-  mv go/* "$GOROOT"
-  rmdir go
-
-  what_shell_profile
-
-  touch "$HOME/.${shell_profile}"
-  {
-    echo "export GOROOT=$GOROOT"
-    echo "export GOPATH=$GOPATH"
-    echo 'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin'
-  } >>"$HOME/.${shell_profile}"
-
-  eval "$CLEAR_UP"
-}
-
-function echo_finding() {
-  finding="Finding latest version"
-  [[ $is_latest_version == "no" ]] && finding="You chose to install version $version_regex"
-  echo "$finding of $($TEXT_COLOR $CYAN)Go${RESET} for $($TEXT_COLOR $YELLOW)$platform${RESET}..."
-}
-
-function update_go() {
-  GOPATH=$(go env GOPATH)
-  GOROOT=$(go env GOROOT)
-  what_installed_version
-  latest=$(extract_version_from "$latest_version_link")
-  current=$(extract_version_from "$INSTALLED_VERSION")
-
-  eval "$CLEAR_UP"
-  echo -e "          VERSION"
-  echo -e "CURRENT:   $current"
-  echo -e "CHOSEN:    $latest"
-
-  if [[ $current == "$latest" ]]; then
-    echo "You already have that version of $($TEXT_COLOR $CYAN)Go${RESET} Installed!"
-    echo "$($TEXT_COLOR $BLUE)Exiting, Bye!${RESET}"
-    exit
-  fi
-
-  echo "Installing will remove the current installed version from '$GOROOT'"
-
-  if [[ $1 == "update" ]]; then
-    # update is used to force update for testing on travis
-    # bypass read option
-    option=""
-  else
-    echo -e "Do you want to install $($TEXT_COLOR $GREEN)Go($latest)${RESET} and remove $($TEXT_COLOR $RED)Go($current)${RESET}? [ENTER(yes)/n]: \c"
-    read -r option
-  fi
-
-  case $option in
-  "" | Y* | y*)
-    remove && install_go
-    ;;
-  N* | n*)
-    echo "Okay, Bye!"
-    exit 0
-    ;;
-  *)
-    echo "Wrong choice!"
-    exit 1
-    ;;
-  esac
-
-}
-
-function remove_downloaded_package() {
-  rm -f "$latest_version_file_name"
-}
-
-function main() {
-  print_welcome
-
-  if [[ $# == 1 ]]; then
-    case $1 in
-    "update")
-      # do nothing, continue execution normally
-      ;;
-    "remove")
-      remove
-      exit
-      ;;
-    *)
-      print_help
-      exit
-      ;;
-    esac
-  elif [[ $# == 2 ]]; then
-    case $1 in
-    "--version")
-      version_regex=$2
-      is_latest_version="no"
-      ;;
-    *)
-      print_help
-      exit
-      ;;
-    esac
-  elif [[ $# > 2 ]]; then
+  if [ "$ACTION" = "help" ]; then
+    print_banner
     print_help
-    exit
+    exit 0
   fi
 
-  what_platform
-  echo_finding
-  find_version_link
+  print_banner
+  TEMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t go-installer)
 
-  if go_exists -eq 0; then
-    echo "Go exists"
-    update_go "$1"
+  detect_os
+  detect_arch
+  detect_shell_profile
+  detect_tooling
+
+  if [ "$ACTION" = "remove" ]; then
+    action_remove
+    exit 0
+  fi
+
+  resolve_release "$REQUESTED_VERSION"
+
+  if go_exists; then
+    action_update
   else
-    install_go
+    action_install
   fi
-
-  test_installation
-  remove_downloaded_package
 }
 
 main "$@"
