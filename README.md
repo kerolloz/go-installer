@@ -26,7 +26,7 @@ wget https://git.io/go-installer.sh && bash go-installer.sh
 
 ```bash
 # doesn't download the script ~ runs the script directly
-bash <(curl -sL https://git.io/go-installer)
+curl -sL https://git.io/go-installer | bash
 ```
 
 Now, you can go grab a cup of coffee :coffee:, sit back :relieved: and relax while the magic happens! :crystal_ball:
