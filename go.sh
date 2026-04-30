@@ -4,7 +4,7 @@ set -euo pipefail
 # ==============================================================================
 # 1. Bootstrap
 # ==============================================================================
-GOROOT="${GOROOT:-/usr/local/go}"
+GOROOT="${GOROOT:-$HOME/.go}"
 GOPATH="${GOPATH:-$HOME/go}"
 GO_API="https://go.dev/dl/?mode=json"
 VERSION_RE='[0-9]+\.[0-9]+(\.[0-9]+)?'
@@ -16,6 +16,8 @@ TEMP_DIR=""
 
 DOWNLOAD_URL="" FILENAME="" CHECKSUM="" LATEST_VERSION=""
 ACTION="install" REQUESTED_VERSION=""
+
+RED="" GREEN="" YELLOW="" BLUE="" CYAN="" RESET=""
 
 setup_colors() {
   if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
@@ -52,6 +54,7 @@ detect_arch() {
 }
 
 detect_shell_profile() {
+  [ -n "${SHELL_PROFILE:-}" ] && return 0
   case "$(basename "${SHELL:-/bin/bash}")" in
     zsh)  SHELL_PROFILE="$HOME/.zshrc" ;;
     fish) SHELL_PROFILE="$HOME/.config/fish/config.fish" ;;
@@ -167,6 +170,8 @@ resolve_release() {
 
   if [ -n "$req" ]; then
     FILENAME="go${req}.${PLATFORM}.tar.gz"
+    printf '%s' "$json" | grep -q "\"filename\" *: *\"$FILENAME\"" \
+      || die "No Go release found for version $req on $PLATFORM."
   else
     FILENAME=$(printf '%s' "$json" | grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" | head -1 | awk -F'"' '{print $4}') || true
   fi
@@ -193,24 +198,52 @@ download_and_stage() {
 }
 
 update_shell_profile() {
-  [ -f "$SHELL_PROFILE" ] || touch "$SHELL_PROFILE"
-  grep -q 'GOROOT' "$SHELL_PROFILE" && return 0
+  local begin_marker="# >>> go.sh managed block >>>"
+  local end_marker="# <<< go.sh managed block <<<"
+  local block
 
-  step "Updating $SHELL_PROFILE..."
+  mkdir -p "$(dirname "$SHELL_PROFILE")"
+  [ -f "$SHELL_PROFILE" ] || touch "$SHELL_PROFILE"
+
   case "$(basename "${SHELL:-/bin/bash}")" in
     fish)
-      printf '%s\n' \
+      block=$(printf '%s\n' \
+        "$begin_marker" \
         "set -gx GOROOT $GOROOT" \
         "set -gx GOPATH $GOPATH" \
-        "set -gx PATH \$PATH $GOROOT/bin $GOPATH/bin" >> "$SHELL_PROFILE"
+        "set -gx PATH \$PATH $GOROOT/bin $GOPATH/bin" \
+        "$end_marker")
       ;;
     *)
-      printf '%s\n' \
+      block=$(printf '%s\n' \
+        "$begin_marker" \
         "export GOROOT=$GOROOT" \
         "export GOPATH=$GOPATH" \
-        'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin' >> "$SHELL_PROFILE"
+        'export PATH=$PATH:$GOROOT/bin:$GOPATH/bin' \
+        "$end_marker")
       ;;
   esac
+
+  step "Updating $SHELL_PROFILE..."
+  if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
+    local tmp_file
+    tmp_file=$(mktemp 2>/dev/null || mktemp -t go-profile)
+    awk -v begin="$begin_marker" -v end="$end_marker" -v replacement="$block" '
+      $0 == begin {
+        print replacement
+        in_block = 1
+        next
+      }
+      $0 == end {
+        in_block = 0
+        next
+      }
+      !in_block { print }
+    ' "$SHELL_PROFILE" > "$tmp_file"
+    mv "$tmp_file" "$SHELL_PROFILE"
+  else
+    printf '\n%s\n' "$block" >> "$SHELL_PROFILE"
+  fi
 }
 
 action_install() {
@@ -219,6 +252,10 @@ action_install() {
   step "Installing to $GOROOT..."
   mkdir -p "$GOPATH"/{src,pkg,bin}
   mkdir -p "$(dirname "$GOROOT")"
+  if [ -e "$GOROOT" ]; then
+    [ -d "$GOROOT" ] || die "$GOROOT exists and is not a directory."
+    rm -rf "$GOROOT" || die "Failed to remove existing $GOROOT."
+  fi
   mv "$TEMP_DIR/go" "$GOROOT" || die "Failed to install to $GOROOT."
 
   update_shell_profile
@@ -231,6 +268,11 @@ action_install() {
 
 action_update() {
   local current
+
+  if [ ! -f "$GOROOT/bin/go" ]; then
+    die "No Go installation found at $GOROOT. Run without 'update' to install."
+  fi
+
   current=$(extract_version "$("$GOROOT/bin/go" version 2>/dev/null || true)")
 
   log "Installed: ${current:-none}"
@@ -273,23 +315,41 @@ action_remove() {
   local depth
   depth=$(printf '%s' "$GOROOT" | tr -cd '/' | wc -c | tr -d ' ')
   [ "$depth" -lt 2 ] && die "Refusing to remove suspicious GOROOT: $GOROOT"
-  [ -f "$GOROOT/bin/go" ] || die "No Go installation found at $GOROOT."
-  "$GOROOT/bin/go" version >/dev/null 2>&1 || die "Invalid Go binary at $GOROOT."
+
+  if [ ! -f "$GOROOT/bin/go" ]; then
+    step "No Go installation found at $GOROOT — nothing to do."
+    return 0
+  fi
+
+  if ! "$GOROOT/bin/go" version >/dev/null 2>&1; then
+    step "Go installation at $GOROOT is not usable — nothing to do."
+    return 0
+  fi
 
   chmod -R u+w "$GOROOT" 2>/dev/null || true
   rm -rf "$GOROOT" || die "Failed to remove $GOROOT."
 
   if [ -f "$SHELL_PROFILE" ]; then
-    step "Cleaning $SHELL_PROFILE..."
-    cp "$SHELL_PROFILE" "${SHELL_PROFILE}.bak"
-    grep -vE "GOROOT|GOPATH" "$SHELL_PROFILE" > "${SHELL_PROFILE}.tmp" || true
-    mv "${SHELL_PROFILE}.tmp" "$SHELL_PROFILE"
+    local begin_marker="# >>> go.sh managed block >>>"
+    local end_marker="# <<< go.sh managed block <<<"
+    if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
+      step "Cleaning $SHELL_PROFILE..."
+      local tmp_file
+      tmp_file=$(mktemp 2>/dev/null || mktemp -t go-profile)
+      cp "$SHELL_PROFILE" "${SHELL_PROFILE}.bak"
+      awk -v begin="$begin_marker" -v end="$end_marker" '
+        $0 == begin { in_block = 1; next }
+        $0 == end   { in_block = 0; next }
+        !in_block   { print }
+      ' "$SHELL_PROFILE" > "$tmp_file"
+      mv "$tmp_file" "$SHELL_PROFILE"
+    fi
   fi
 
   step "${GREEN}Go removed.${RESET}"
 }
 
-go_exists() { command -v go >/dev/null 2>&1 || [ -x "$GOROOT/bin/go" ]; }
+go_exists() { [ -x "$GOROOT/bin/go" ]; }
 
 # ==============================================================================
 # 5. Main
@@ -333,8 +393,8 @@ parse_args() {
 }
 
 main() {
-  parse_args "$@"
   setup_colors
+  parse_args "$@"
 
   if [ "$ACTION" = "help" ]; then
     print_banner
@@ -343,7 +403,7 @@ main() {
   fi
 
   print_banner
-  TEMP_DIR=$(mktemp -d)
+  TEMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t go-installer)
 
   detect_os
   detect_arch

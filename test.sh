@@ -4,6 +4,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$SCRIPT_DIR/go.sh"
 
+# Create isolated test environment to avoid modifying real shell profiles
+TEST_HOME=$(mktemp -d 2>/dev/null || mktemp -d -t go-installer-test)
+trap 'rm -rf "$TEST_HOME"' EXIT
+export HOME="$TEST_HOME"
+export SHELL_PROFILE="$TEST_HOME/test-profile.sh"
+
 unset GOROOT GOPATH
 export GOROOT="$HOME/.go-test"
 export GOPATH="$HOME/go-test-workspace"
@@ -37,28 +43,39 @@ ensure_clean() {
 
 run_test "Install latest Go"
 ensure_clean
-bash "$SCRIPT"
-if [ -x "$GOROOT/bin/go" ] && "$GOROOT/bin/go" version >/dev/null 2>&1; then
-  INSTALLED_VERSION=$("$GOROOT/bin/go" version | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
-  pass "Installed Go $INSTALLED_VERSION"
+if bash "$SCRIPT"; then
+  if [ -x "$GOROOT/bin/go" ] && "$GOROOT/bin/go" version >/dev/null 2>&1; then
+    INSTALLED_VERSION=$("$GOROOT/bin/go" version | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)
+    pass "Installed Go $INSTALLED_VERSION"
+  else
+    fail "Install latest" "go binary not found or not executable at $GOROOT/bin/go"
+  fi
 else
-  fail "Install latest" "go binary not found or not executable at $GOROOT/bin/go"
+  fail "Install latest" "installer exited with a non-zero status"
 fi
 
 run_test "Install again (already installed, should be a no-op)"
-bash "$SCRIPT" 2>&1 | tee /tmp/go-test-reinstall.log
-if grep -q "nothing to do" /tmp/go-test-reinstall.log; then
-  pass "Correctly detected existing installation"
+REINSTALL_LOG=$(mktemp 2>/dev/null || mktemp -t go-test-reinstall)
+if bash "$SCRIPT" 2>&1 | tee "$REINSTALL_LOG"; then
+  if grep -q "nothing to do" "$REINSTALL_LOG"; then
+    pass "Correctly detected existing installation"
+  else
+    fail "Re-install detection" "did not report 'nothing to do'"
+  fi
 else
-  fail "Re-install detection" "did not report 'nothing to do'"
+  fail "Install again" "installer exited with a non-zero status"
 fi
 
 run_test "Update (already on latest, should be a no-op)"
-bash "$SCRIPT" update 2>&1 | tee /tmp/go-test-update.log
-if grep -q "nothing to do" /tmp/go-test-update.log; then
-  pass "Update correctly detected latest is current"
+UPDATE_LOG=$(mktemp 2>/dev/null || mktemp -t go-test-update)
+if bash "$SCRIPT" update 2>&1 | tee "$UPDATE_LOG"; then
+  if grep -q "nothing to do" "$UPDATE_LOG"; then
+    pass "Update correctly detected latest is current"
+  else
+    fail "Update no-op" "did not report 'nothing to do'"
+  fi
 else
-  fail "Update no-op" "did not report 'nothing to do'"
+  fail "Update" "installer exited with a non-zero status"
 fi
 
 run_test "Workspace directories created"
@@ -91,28 +108,34 @@ else
 fi
 
 run_test "Remove Go"
-bash "$SCRIPT" remove
-if [ ! -d "$GOROOT" ]; then
-  pass "GOROOT removed"
+if bash "$SCRIPT" remove; then
+  if [ ! -d "$GOROOT" ]; then
+    pass "GOROOT removed"
+  else
+    fail "Remove" "$GOROOT still exists"
+  fi
 else
-  fail "Remove" "$GOROOT still exists"
+  fail "Remove" "installer exited with a non-zero status"
 fi
 
-run_test "Remove again (nothing to remove, should fail gracefully)"
-if bash "$SCRIPT" remove 2>/dev/null; then
-  fail "Double remove" "expected non-zero exit"
+run_test "Remove again (nothing to remove, should be a no-op)"
+if bash "$SCRIPT" remove 2>&1; then
+  pass "Correctly exited cleanly when nothing to remove"
 else
-  pass "Correctly failed when nothing to remove"
+  fail "Remove idempotency" "expected zero exit when nothing to remove"
 fi
 
 run_test "Install specific version (1.21.0)"
 ensure_clean
-bash "$SCRIPT" --version 1.21.0
-actual=$("$GOROOT/bin/go" version 2>&1)
-if printf '%s' "$actual" | grep -q "go1.21.0"; then
-  pass "Installed Go 1.21.0"
+if bash "$SCRIPT" --version 1.21.0; then
+  actual=$("$GOROOT/bin/go" version 2>&1)
+  if printf '%s' "$actual" | grep -q "go1.21.0"; then
+    pass "Installed Go 1.21.0"
+  else
+    fail "Specific version" "expected 1.21.0, got: $actual"
+  fi
 else
-  fail "Specific version" "expected 1.21.0, got: $actual"
+  fail "Specific version" "installer exited with a non-zero status"
 fi
 
 run_test "--version without value exits with error"
@@ -124,11 +147,14 @@ fi
 
 run_test "Checksum was verified (not empty)"
 ensure_clean
-output=$(bash "$SCRIPT" --version 1.22.0 2>&1)
-if printf '%s' "$output" | grep -q "Checksum verified"; then
-  pass "Checksum verification ran"
+if output=$(bash "$SCRIPT" --version 1.22.0 2>&1); then
+  if printf '%s' "$output" | grep -q "Checksum verified"; then
+    pass "Checksum verification ran"
+  else
+    fail "Checksum" "no checksum verification in output"
+  fi
 else
-  fail "Checksum" "no checksum verification in output"
+  fail "Checksum" "installer exited with a non-zero status"
 fi
 
 run_test "Cleanup"
