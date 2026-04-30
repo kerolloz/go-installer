@@ -170,15 +170,15 @@ resolve_release() {
 
   if [ -n "$req" ]; then
     FILENAME="go${req}.${PLATFORM}.tar.gz"
-    printf '%s' "$json" | grep -q "\"filename\" *: *\"$FILENAME\"" \
+    grep -q "\"filename\" *: *\"$FILENAME\"" <<< "$json" \
       || die "No Go release found for version $req on platform $PLATFORM."
   else
-    FILENAME=$(printf '%s' "$json" | grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" | head -1 | awk -F'"' '{print $4}') || true
+    FILENAME=$(grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" <<< "$json" | head -1 | awk -F'"' '{print $4}') || true
   fi
 
   [ -z "$FILENAME" ] && die "No Go release found for ${req:+version $req on }$PLATFORM."
 
-  CHECKSUM=$(printf '%s' "$json" | grep -A5 "\"filename\" *: *\"$FILENAME\"" | grep -oE '"sha256" *: *"[a-f0-9]+"' | head -1 | awk -F'"' '{print $4}') || true
+  CHECKSUM=$(grep -A5 "\"filename\" *: *\"$FILENAME\"" <<< "$json" | grep -oE '"sha256" *: *"[a-f0-9]+"' | head -1 | awk -F'"' '{print $4}') || true
   LATEST_VERSION="${req:-$(extract_version "$FILENAME")}"
   DOWNLOAD_URL="https://go.dev/dl/${FILENAME}"
 }
@@ -228,9 +228,9 @@ update_shell_profile() {
   if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
     local tmpfile
     tmpfile=$(mktemp 2>/dev/null || mktemp -t go-profile)
-    awk -v begin="$begin_marker" -v end="$end_marker" -v replacement="$block" '
+    GO_BLOCK="$block" awk -v begin="$begin_marker" -v end="$end_marker" '
       $0 == begin {
-        print replacement
+        print ENVIRON["GO_BLOCK"]
         in_block = 1
         next
       }
