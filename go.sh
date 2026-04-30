@@ -171,7 +171,7 @@ resolve_release() {
   if [ -n "$req" ]; then
     FILENAME="go${req}.${PLATFORM}.tar.gz"
     printf '%s' "$json" | grep -q "\"filename\" *: *\"$FILENAME\"" \
-      || die "No Go release found for version $req on $PLATFORM."
+      || die "No Go release found for version $req on platform $PLATFORM."
   else
     FILENAME=$(printf '%s' "$json" | grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" | head -1 | awk -F'"' '{print $4}') || true
   fi
@@ -226,8 +226,8 @@ update_shell_profile() {
 
   step "Updating $SHELL_PROFILE..."
   if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
-    local tmp_file
-    tmp_file=$(mktemp 2>/dev/null || mktemp -t go-profile)
+    local tmpfile
+    tmpfile=$(mktemp 2>/dev/null || mktemp -t go-profile)
     awk -v begin="$begin_marker" -v end="$end_marker" -v replacement="$block" '
       $0 == begin {
         print replacement
@@ -239,8 +239,8 @@ update_shell_profile() {
         next
       }
       !in_block { print }
-    ' "$SHELL_PROFILE" > "$tmp_file"
-    mv "$tmp_file" "$SHELL_PROFILE"
+    ' "$SHELL_PROFILE" > "$tmpfile"
+    mv "$tmpfile" "$SHELL_PROFILE"
   else
     printf '\n%s\n' "$block" >> "$SHELL_PROFILE"
   fi
@@ -334,15 +334,15 @@ action_remove() {
     local end_marker="# <<< go.sh managed block <<<"
     if grep -Fq "$begin_marker" "$SHELL_PROFILE"; then
       step "Cleaning $SHELL_PROFILE..."
-      local tmp_file
-      tmp_file=$(mktemp 2>/dev/null || mktemp -t go-profile)
+      local tmpfile
+      tmpfile=$(mktemp 2>/dev/null || mktemp -t go-profile)
       cp "$SHELL_PROFILE" "${SHELL_PROFILE}.bak"
       awk -v begin="$begin_marker" -v end="$end_marker" '
         $0 == begin { in_block = 1; next }
         $0 == end   { in_block = 0; next }
         !in_block   { print }
-      ' "$SHELL_PROFILE" > "$tmp_file"
-      mv "$tmp_file" "$SHELL_PROFILE"
+      ' "$SHELL_PROFILE" > "$tmpfile"
+      mv "$tmpfile" "$SHELL_PROFILE"
     fi
   fi
 

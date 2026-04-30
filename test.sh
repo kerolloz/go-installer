@@ -5,10 +5,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$SCRIPT_DIR/go.sh"
 
 # Create isolated test environment to avoid modifying real shell profiles
-TEST_HOME=$(mktemp -d 2>/dev/null || mktemp -d -t go-installer-test)
-trap 'rm -rf "$TEST_HOME"' EXIT
-export HOME="$TEST_HOME"
-export SHELL_PROFILE="$TEST_HOME/test-profile.sh"
+test_home=$(mktemp -d 2>/dev/null || mktemp -d -t go-installer-test)
+trap 'rm -rf "$test_home"' EXIT
+export HOME="$test_home"
+export SHELL_PROFILE="$test_home/test-profile.sh"
 
 unset GOROOT GOPATH
 export GOROOT="$HOME/.go-test"
