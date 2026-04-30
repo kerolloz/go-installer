@@ -165,38 +165,15 @@ resolve_release() {
   local json
   json=$(fetch "$url") || die "Failed to reach Go release API."
 
-  if command -v python3 >/dev/null 2>&1; then
-    local result
-    result=$(python3 -c "
-import sys, json
-data = json.loads(sys.stdin.read())
-req, plat = sys.argv[1], sys.argv[2]
-os_name, arch = plat.split('-')
-for r in data:
-    if req:
-        target = 'go' + req + '.' + plat + '.tar.gz'
-        for f in r.get('files', []):
-            if f['filename'] == target:
-                print(f['filename']); print(f.get('sha256', '')); sys.exit()
-    else:
-        for f in r.get('files', []):
-            if f.get('os') == os_name and f.get('arch') == arch and f.get('kind') == 'archive':
-                print(f['filename']); print(f.get('sha256', '')); sys.exit()
-" "$req" "$PLATFORM" <<< "$json" 2>/dev/null) || true
-    FILENAME=$(sed -n '1p' <<< "$result")
-    CHECKSUM=$(sed -n '2p' <<< "$result")
+  if [ -n "$req" ]; then
+    FILENAME="go${req}.${PLATFORM}.tar.gz"
   else
-    if [ -n "$req" ]; then
-      FILENAME="go${req}.${PLATFORM}.tar.gz"
-    else
-      FILENAME=$(grep -oE "\"filename\": *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" <<< "$json" | head -1 | awk -F'"' '{print $4}') || true
-    fi
-    if [ -n "$FILENAME" ]; then
-      CHECKSUM=$(grep -A5 "\"filename\": *\"$FILENAME\"" <<< "$json" | grep -oE '"sha256": *"[a-f0-9]+"' | awk -F'"' '{print $4}' | head -1) || true
-    fi
+    FILENAME=$(printf '%s' "$json" | grep -oE "\"filename\" *: *\"go${VERSION_RE}\.${PLATFORM}\.tar\.gz\"" | head -1 | awk -F'"' '{print $4}') || true
   fi
 
   [ -z "$FILENAME" ] && die "No Go release found for ${req:+version $req on }$PLATFORM."
+
+  CHECKSUM=$(printf '%s' "$json" | grep -A5 "\"filename\" *: *\"$FILENAME\"" | grep -oE '"sha256" *: *"[a-f0-9]+"' | head -1 | awk -F'"' '{print $4}') || true
   LATEST_VERSION="${req:-$(extract_version "$FILENAME")}"
   DOWNLOAD_URL="https://go.dev/dl/${FILENAME}"
 }
@@ -254,7 +231,7 @@ action_install() {
 
 action_update() {
   local current
-  current=$(extract_version "$(go version 2>/dev/null || true)")
+  current=$(extract_version "$("$GOROOT/bin/go" version 2>/dev/null || true)")
 
   log "Installed: ${current:-none}"
   log "Available: $LATEST_VERSION"
